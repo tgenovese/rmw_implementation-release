@@ -14,7 +14,7 @@ tracks:
       :{release_inc}
     devel_branch: null
     name: upstream
-    patches: xenial
+    patches: null
     release_inc: -1
     release_repo_url: git@github.com:nuclearsandwich/rmw_implementation-release
     release_tag: master
