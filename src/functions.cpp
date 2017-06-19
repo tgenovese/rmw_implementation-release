@@ -22,11 +22,16 @@
 #include <fstream>
 #include <sstream>
 
+#include "rcutils/allocator.h"
+#include "rcutils/format_string.h"
 #include "rcutils/types/string_array.h"
 
 #include "Poco/SharedLibrary.h"
 
 #include "rmw/error_handling.h"
+#include "rmw/names_and_types.h"
+#include "rmw/get_service_names_and_types.h"
+#include "rmw/get_topic_names_and_types.h"
 #include "rmw/rmw.h"
 
 std::string get_env_var(const char * env_var)
@@ -141,7 +146,16 @@ get_symbol(const char * symbol_name)
     return nullptr;
   }
   if (!lib->hasSymbol(symbol_name)) {
-    RMW_SET_ERROR_MSG("failed to resolve symbol in shared library of rmw implementation");
+    rcutils_allocator_t allocator = rcutils_get_default_allocator();
+    char * msg = rcutils_format_string(
+      allocator,
+      "failed to resolve symbol in shared library '%s'", lib->getPath().c_str());
+    if (msg) {
+      RMW_SET_ERROR_MSG(msg);
+      allocator.deallocate(msg, allocator.state);
+    } else {
+      RMW_SET_ERROR_MSG("failed to allocate memory for error message")
+    }
     return nullptr;
   }
   return lib->getSymbol(symbol_name);
@@ -183,11 +197,13 @@ rmw_init(void)
 }
 
 rmw_node_t *
-rmw_create_node(const char * name, const char * namespace_, size_t domain_id)
+rmw_create_node(const char * name, const char * namespace_, size_t domain_id,
+  const rmw_node_security_options_t * security_options)
 {
   CALL_SYMBOL(
     "rmw_create_node", rmw_node_t *, nullptr,
-    ARG_TYPES(const char *, const char *, size_t), ARG_VALUES(name, namespace_, domain_id));
+    ARG_TYPES(const char *, const char *, size_t, const rmw_node_security_options_t *),
+    ARG_VALUES(name, namespace_, domain_id, security_options));
 }
 
 rmw_ret_t
@@ -450,22 +466,26 @@ rmw_wait(
 rmw_ret_t
 rmw_get_topic_names_and_types(
   const rmw_node_t * node,
-  rmw_topic_names_and_types_t * topic_names_and_types)
+  rcutils_allocator_t * allocator,
+  bool no_demangle,
+  rmw_names_and_types_t * topic_names_and_types)
 {
   CALL_SYMBOL(
     "rmw_get_topic_names_and_types", rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_node_t *, rmw_topic_names_and_types_t *),
-    ARG_VALUES(node, topic_names_and_types));
+    ARG_TYPES(const rmw_node_t *, rcutils_allocator_t *, bool, rmw_names_and_types_t *),
+    ARG_VALUES(node, allocator, no_demangle, topic_names_and_types));
 }
 
 rmw_ret_t
-rmw_destroy_topic_names_and_types(
-  rmw_topic_names_and_types_t * topic_names_and_types)
+rmw_get_service_names_and_types(
+  const rmw_node_t * node,
+  rcutils_allocator_t * allocator,
+  rmw_names_and_types_t * service_names_and_types)
 {
   CALL_SYMBOL(
-    "rmw_destroy_topic_names_and_types", rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(rmw_topic_names_and_types_t *),
-    ARG_VALUES(topic_names_and_types));
+    "rmw_get_service_names_and_types", rmw_ret_t, RMW_RET_ERROR,
+    ARG_TYPES(const rmw_node_t *, rcutils_allocator_t *, rmw_names_and_types_t *),
+    ARG_VALUES(node, allocator, service_names_and_types));
 }
 
 rmw_ret_t
