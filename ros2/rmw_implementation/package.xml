@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>rmw_implementation</name>
   <version>:{version}</version>
   <description>The decision which ROS middleware implementation should be used for C++.</description>
@@ -20,6 +20,8 @@
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+
+  <group_depend>rmw_implementation_packages</group_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
