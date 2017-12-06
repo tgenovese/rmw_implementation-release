@@ -1,0 +1,12 @@
+Source: ros-ardent-rmw-implementation
+Section: misc
+Priority: extra
+Maintainer: Dirk Thomas <dthomas@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), ros-ardent-ament-cmake, ros-ardent-ament-lint-auto, ros-ardent-ament-lint-common, ros-ardent-rcutils, ros-ardent-rmw, ros-ardent-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-ardent-rmw-implementation
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-ardent-ros-workspace
+Description: The decision which ROS middleware implementation should be used for C++.
