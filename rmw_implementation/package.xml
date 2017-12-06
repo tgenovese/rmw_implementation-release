@@ -12,10 +12,10 @@
   <build_depend>rcutils</build_depend>
   <build_depend>rmw</build_depend>
 
+  <depend>libpoco-dev</depend>
   <depend>poco_vendor</depend>
   <depend>rmw_implementation_cmake</depend>
   <depend>rmw_fastrtps_cpp</depend>
-  <depend>rmw_opensplice_cpp</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
