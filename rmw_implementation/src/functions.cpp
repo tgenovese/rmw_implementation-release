@@ -124,13 +124,20 @@ get_library()
     }
     std::string library_path = find_library_path(env_var);
     if (library_path.empty()) {
-      RMW_SET_ERROR_MSG("failed to find shared library of rmw implementation");
+      RMW_SET_ERROR_MSG(
+        ("failed to find shared library of rmw implementation. Searched " + env_var).c_str());
       return nullptr;
     }
     try {
       lib = new Poco::SharedLibrary(library_path);
+    } catch (Poco::LibraryLoadException & e) {
+      RMW_SET_ERROR_MSG(("failed to load shared library of rmw implementation. Exception: " +
+        e.displayText()).c_str());
+      return nullptr;
     } catch (...) {
       RMW_SET_ERROR_MSG("failed to load shared library of rmw implementation");
+      RMW_SET_ERROR_MSG(
+        ("failed to load shared library of rmw implementation: " + library_path).c_str());
       return nullptr;
     }
   }
@@ -149,7 +156,7 @@ get_symbol(const char * symbol_name)
     rcutils_allocator_t allocator = rcutils_get_default_allocator();
     char * msg = rcutils_format_string(
       allocator,
-      "failed to resolve symbol in shared library '%s'", lib->getPath().c_str());
+      "failed to resolve symbol '%s' in shared library '%s'", symbol_name, lib->getPath().c_str());
     if (msg) {
       RMW_SET_ERROR_MSG(msg);
       allocator.deallocate(msg, allocator.state);
@@ -161,7 +168,7 @@ get_symbol(const char * symbol_name)
   return lib->getSymbol(symbol_name);
 }
 
-#if __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
 #endif
@@ -239,6 +246,18 @@ RMW_INTERFACE_FN(rmw_publish,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_publisher_t *, const void *))
 
+RMW_INTERFACE_FN(rmw_publish_serialized_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_publisher_t *, const rmw_serialized_message_t *))
+
+RMW_INTERFACE_FN(rmw_serialize,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const void *, const rosidl_message_type_support_t *, rmw_serialized_message_t *))
+
+RMW_INTERFACE_FN(rmw_deserialize,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_serialized_message_t *, const rosidl_message_type_support_t *, void *))
+
 RMW_INTERFACE_FN(rmw_create_subscription,
   rmw_subscription_t *, nullptr,
   5, ARG_TYPES(
@@ -256,6 +275,15 @@ RMW_INTERFACE_FN(rmw_take,
 RMW_INTERFACE_FN(rmw_take_with_info,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_message_info_t *))
+
+RMW_INTERFACE_FN(rmw_take_serialized_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_subscription_t *, rmw_serialized_message_t *, bool *))
+
+RMW_INTERFACE_FN(rmw_take_serialized_message_with_info,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    const rmw_subscription_t *, rmw_serialized_message_t *, bool *, rmw_message_info_t *))
 
 RMW_INTERFACE_FN(rmw_create_client,
   rmw_client_t *, nullptr,
@@ -355,6 +383,10 @@ RMW_INTERFACE_FN(rmw_service_server_is_available,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_node_t *, const rmw_client_t *, bool *))
 
+RMW_INTERFACE_FN(rmw_set_log_severity,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_log_severity_t))
+
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -368,10 +400,15 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_create_publisher)
   GET_SYMBOL(rmw_destroy_publisher)
   GET_SYMBOL(rmw_publish)
+  GET_SYMBOL(rmw_publish_serialized_message)
+  GET_SYMBOL(rmw_serialize)
+  GET_SYMBOL(rmw_deserialize)
   GET_SYMBOL(rmw_create_subscription)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_take)
   GET_SYMBOL(rmw_take_with_info)
+  GET_SYMBOL(rmw_take_serialized_message)
+  GET_SYMBOL(rmw_take_serialized_message_with_info)
   GET_SYMBOL(rmw_create_client)
   GET_SYMBOL(rmw_destroy_client)
   GET_SYMBOL(rmw_send_request)
@@ -406,6 +443,6 @@ rmw_init(void)
     rmw_init, rmw_ret_t, RMW_RET_ERROR, ARG_TYPES(void), ARG_VALUES_0())
 }
 
-#if __cplusplus
+#ifdef __cplusplus
 }
 #endif
