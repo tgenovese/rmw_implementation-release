@@ -1,4 +1,4 @@
-From 8fb01cbe6ff6fae1c7f8b29b42bf927f1b3ca038 Mon Sep 17 00:00:00 2001
+From 616c600e1b320e2eb88e0b2840ea5a261d0708ff Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?= <steven@nuclearsandwich.com>
 Date: Fri, 16 Nov 2018 15:58:14 -0800
 Subject: [PATCH 2/2] Fix rosdistro name.
@@ -21,5 +21,5 @@ index c1a1fb6..fb39f81 100644
  @[if Replaces]Replaces: @(', '.join(Replaces))@\n@[end if]@
  Description: @(Description)
 -- 
-2.7.4
+2.17.1
 
