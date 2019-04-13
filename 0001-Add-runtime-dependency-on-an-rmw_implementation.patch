@@ -1,0 +1,26 @@
+From c6c5fd20ca9964bddf00fc2706d5d5bbaf8f61a6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?= <steven@nuclearsandwich.com>
+Date: Fri, 16 Nov 2018 14:04:51 -0800
+Subject: [PATCH] Add runtime dependency on an rmw_implementation.
+
+Any one of the rmw implementations can satisfy the runtime depenency.
+---
+ debian/control.em | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/debian/control.em b/debian/control.em
+index 7cbf65a..132970c 100644
+--- a/debian/control.em
++++ b/debian/control.em
+@@ -8,7 +8,7 @@ Standards-Version: 3.9.2
+ 
+ Package: @(Package)
+ Architecture: any
+-Depends: ${shlibs:Depends}, ${misc:Depends}, @(', '.join(Depends))
++Depends: ${shlibs:Depends}, ${misc:Depends}, @(', '.join(Depends)), ros-dashing-rmw-fastrtps-cpp | ros-dashing-rmw-connext-cpp | ros-dashing-rmw-opensplice-cpp
+ @[if Conflicts]Conflicts: @(', '.join(Conflicts))@\n@[end if]@
+ @[if Replaces]Replaces: @(', '.join(Replaces))@\n@[end if]@
+ Description: @(Description)
+-- 
+2.7.4
+
