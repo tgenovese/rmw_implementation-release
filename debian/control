@@ -1,0 +1,12 @@
+Source: ros-dashing-rmw-implementation
+Section: misc
+Priority: extra
+Maintainer: Dirk Thomas <dthomas@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), ros-dashing-ament-cmake, ros-dashing-ament-lint-auto, ros-dashing-ament-lint-common, ros-dashing-poco-vendor, ros-dashing-rcutils, ros-dashing-rmw, ros-dashing-rmw-fastrtps-cpp, ros-dashing-rmw-implementation-cmake, ros-dashing-rmw-opensplice-cpp, ros-dashing-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-dashing-rmw-implementation
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-dashing-poco-vendor, ros-dashing-rmw-fastrtps-cpp, ros-dashing-rmw-implementation-cmake, ros-dashing-rmw-opensplice-cpp, ros-dashing-ros-workspace, ros-dashing-rmw-fastrtps-cpp | ros-dashing-rmw-connext-cpp | ros-dashing-rmw-opensplice-cpp
+Description: The decision which ROS middleware implementation should be used for C++.
