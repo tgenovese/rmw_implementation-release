@@ -88,7 +88,7 @@ tracks:
     devel_branch: master
     last_version: 0.7.1
     name: rmw_implementation
-    patches: ros2
+    patches: null
     release_inc: '1'
     release_repo_url: https://github.com/ros2-gbp/rmw_implementation-release.git
     release_tag: :{version}
