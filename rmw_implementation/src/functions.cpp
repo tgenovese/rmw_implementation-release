@@ -347,6 +347,10 @@ RMW_INTERFACE_FN(rmw_subscription_count_matched_publishers,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_subscription_t *, size_t *))
 
+RMW_INTERFACE_FN(rmw_subscription_get_actual_qos,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_subscription_t *, rmw_qos_profile_t *))
+
 RMW_INTERFACE_FN(rmw_take,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_subscription_allocation_t *))
@@ -453,6 +457,12 @@ RMW_INTERFACE_FN(rmw_get_service_names_and_types_by_node,
     const rmw_node_t *, rcutils_allocator_t *, const char *, const char *,
     rmw_names_and_types_t *))
 
+RMW_INTERFACE_FN(rmw_get_client_names_and_types_by_node,
+  rmw_ret_t, RMW_RET_ERROR,
+  5, ARG_TYPES(
+    const rmw_node_t *, rcutils_allocator_t *, const char *, const char *,
+    rmw_names_and_types_t *))
+
 RMW_INTERFACE_FN(rmw_get_topic_names_and_types,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(
@@ -527,6 +537,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_create_subscription)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_subscription_count_matched_publishers);
+  GET_SYMBOL(rmw_subscription_get_actual_qos);
   GET_SYMBOL(rmw_take)
   GET_SYMBOL(rmw_take_with_info)
   GET_SYMBOL(rmw_take_serialized_message)
@@ -549,6 +560,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_publisher_names_and_types_by_node)
   GET_SYMBOL(rmw_get_subscriber_names_and_types_by_node)
   GET_SYMBOL(rmw_get_service_names_and_types_by_node)
+  GET_SYMBOL(rmw_get_client_names_and_types_by_node)
   GET_SYMBOL(rmw_get_topic_names_and_types)
   GET_SYMBOL(rmw_get_service_names_and_types)
   GET_SYMBOL(rmw_get_node_names)
