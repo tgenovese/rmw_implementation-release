@@ -1,3 +1,26 @@
+## rmw_implementation (eloquent) - 0.8.0-1
+
+The packages in the `rmw_implementation` repository were released into the `eloquent` distro by running `/usr/bin/bloom-release -r eloquent rmw_implementation` on `Thu, 26 Sep 2019 16:37:57 -0000`
+
+The `rmw_implementation` package was released.
+
+Version of package(s) in repository `rmw_implementation`:
+
+- upstream repository: https://github.com/ros2/rmw_implementation
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `0.8.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.8.0`
+- catkin_pkg version: `0.4.13`
+- rosdep version: `0.16.1`
+- rosdistro version: `0.7.4`
+- vcstools version: `0.1.42`
+
+
 ## rmw_implementation (dashing) - 0.7.1-2
 
 The packages in the `rmw_implementation` repository were released into the `dashing` distro by running `/usr/bin/bloom-release -r dashing rmw_implementation --override-release-repository-push-url git@github.com:ros2-gbp/rmw_implementation-release` on `Mon, 03 Jun 2019 20:10:42 -0000`
