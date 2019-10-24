@@ -12,13 +12,13 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 
 find_package(rcutils REQUIRED)
 
-# provides FindPoco.cmake and Poco on platforms without it
-find_package(poco_vendor)
-find_package(Poco COMPONENTS Foundation)
 find_package(rmw_implementation_cmake REQUIRED)
+
+ament_python_install_package(${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -27,45 +27,36 @@ endif()
 
 get_default_rmw_implementation(RMW_IMPLEMENTATION)
 
-get_available_rmw_implementations(RMW_IMPLEMENTATIONS)
-message(STATUS "")
-message(STATUS "Found these rmw implementations:")
-foreach(impl IN LISTS RMW_IMPLEMENTATIONS)
-  message(STATUS "  '${impl}'")
-endforeach()
-
 message(STATUS "")
 message(STATUS "Default rmw implementation: '${RMW_IMPLEMENTATION}'")
 message(STATUS "")
 
-option(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING
-  "Force use of dynamic loading (via poco), even if there is only one implementation available"
-  OFF)
-
-# Nominally use dynamic loading if poco is available.
-set(RMW_IMPLEMENTATION_SUPPORTS_POCO ${Poco_FOUND})
-# Determine if we're going to actually support dynamic loading.
-if(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING)
-  # Force usage.
-  if(NOT Poco_FOUND)
-    message(FATAL_ERROR "Dynamic loading forced, but poco is not found!")
-  endif()
-  set(RMW_IMPLEMENTATION_SUPPORTS_POCO TRUE)
-elseif(NOT RMW_IMPLEMENTATIONS MATCHES ";")
-  set(RMW_IMPLEMENTATION_SUPPORTS_POCO FALSE)
+get_available_rmw_implementations(available_rmw_implementations)
+list(LENGTH available_rmw_implementations count_available_rmw_implementations)
+if(count_available_rmw_implementations EQUAL 1)
+  set(rmw_implementation_disable_runtime_selection_default ON)
+else()
+  set(rmw_implementation_disable_runtime_selection_default OFF)
 endif()
 
-if(NOT RMW_IMPLEMENTATION_SUPPORTS_POCO)
-  message(STATUS "Dynamic loading disabled; directly referencing '${RMW_IMPLEMENTATION}'")
-  message(STATUS "")
+option(RMW_IMPLEMENTATION_DISABLE_RUNTIME_SELECTION "\
+  Use only the RMW implementation specified at build time via the \
+  'RMW_IMPLEMENTATION' environment variable and the 'RMW_IMPLEMENTATION' \
+  CMake option, ignoring the runtime value of the 'RMW_IMPLEMENTATION' \
+  environment variable"
+  ${rmw_implementation_disable_runtime_selection_default})
 
+if(RMW_IMPLEMENTATION_DISABLE_RUNTIME_SELECTION)
+  message(STATUS "Runtime selection of RMW disabled; Only using "
+    "'${RMW_IMPLEMENTATION}'")
 else()
-  message(STATUS "Dynamic loading enabled with any of the available rmw implementations")
-  message(STATUS "")
+  message(STATUS "Runtime selection of RMW enabled")
 
+  # provides FindPoco.cmake and Poco on platforms without it
+  find_package(poco_vendor REQUIRED)
+  find_package(Poco REQUIRED COMPONENTS Foundation)
   find_package(rmw REQUIRED)
 
-  link_directories(${Poco_LIBRARY_DIR})
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
   ament_target_dependencies(${PROJECT_NAME}
@@ -73,7 +64,6 @@ else()
     "rmw")
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
-  target_link_libraries(${PROJECT_NAME})
   configure_rmw_library(${PROJECT_NAME})
 
   ament_export_libraries(${PROJECT_NAME})
@@ -91,8 +81,6 @@ register_rmw_implementation(
   "cpp:rosidl_typesupport_cpp"
 )
 
-# necessary since get_available_rmw_implementations excludes rmw_implementation
-list(APPEND RMW_IMPLEMENTATIONS "rmw_implementation")
 ament_package(
   CONFIG_EXTRAS "rmw_implementation-extras.cmake.in"
 )
