@@ -1,0 +1,26 @@
+From 4da6e1baca05b802b849cf7895eeb59f39e1a410 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Steven!=20Ragnaro=CC=88k?= <steven@nuclearsandwich.com>
+Date: Wed, 13 Nov 2019 23:23:40 -0500
+Subject: [PATCH 2/2] rmw-cyclonedds-cpp may satisfy the implementation
+ dependency.
+
+---
+ debian/control.em | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/debian/control.em b/debian/control.em
+index 88a822e..513d0a2 100644
+--- a/debian/control.em
++++ b/debian/control.em
+@@ -8,7 +8,7 @@ Standards-Version: 3.9.2
+ 
+ Package: @(Package)
+ Architecture: any
+-Depends: ${shlibs:Depends}, ${misc:Depends}, @(', '.join(Depends)), ros-eloquent-rmw-fastrtps-cpp | ros-eloquent-rmw-connext-cpp | ros-eloquent-rmw-opensplice-cpp
++Depends: ${shlibs:Depends}, ${misc:Depends}, @(', '.join(Depends)), ros-eloquent-rmw-fastrtps-cpp | ros-eloquent-rmw-connext-cpp | ros-eloquent-rmw-cyclonedds-cpp | ros-eloquent-rmw-opensplice-cpp
+ @[if Conflicts]Conflicts: @(', '.join(Conflicts))@\n@[end if]@
+ @[if Replaces]Replaces: @(', '.join(Replaces))@\n@[end if]@
+ Description: @(Description)
+-- 
+2.24.0
+
