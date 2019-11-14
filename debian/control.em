@@ -8,7 +8,7 @@ Standards-Version: 3.9.2
 
 Package: @(Package)
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, @(', '.join(Depends)), ros-eloquent-rmw-fastrtps-cpp | ros-eloquent-rmw-connext-cpp | ros-eloquent-rmw-opensplice-cpp
+Depends: ${shlibs:Depends}, ${misc:Depends}, @(', '.join(Depends)), ros-eloquent-rmw-fastrtps-cpp | ros-eloquent-rmw-connext-cpp | ros-eloquent-rmw-cyclonedds-cpp | ros-eloquent-rmw-opensplice-cpp
 @[if Conflicts]Conflicts: @(', '.join(Conflicts))@\n@[end if]@
 @[if Replaces]Replaces: @(', '.join(Replaces))@\n@[end if]@
 Description: @(Description)
