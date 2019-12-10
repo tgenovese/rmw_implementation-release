@@ -12,13 +12,10 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(ament_cmake_python REQUIRED)
 
 find_package(rcutils REQUIRED)
 
 find_package(rmw_implementation_cmake REQUIRED)
-
-ament_python_install_package(${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -31,9 +28,15 @@ message(STATUS "")
 message(STATUS "Default rmw implementation: '${RMW_IMPLEMENTATION}'")
 message(STATUS "")
 
+option(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING
+  "Force use of dynamic loading (via poco), even if there is only one implementation available"
+  OFF)
+
 get_available_rmw_implementations(available_rmw_implementations)
 list(LENGTH available_rmw_implementations count_available_rmw_implementations)
-if(count_available_rmw_implementations EQUAL 1)
+if(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING)
+  set(rmw_implementation_disable_runtime_selection_default OFF)
+elseif(count_available_rmw_implementations EQUAL 1)
   set(rmw_implementation_disable_runtime_selection_default ON)
 else()
   set(rmw_implementation_disable_runtime_selection_default OFF)
@@ -57,6 +60,7 @@ else()
   find_package(Poco REQUIRED COMPONENTS Foundation)
   find_package(rmw REQUIRED)
 
+  link_directories(${Poco_LIBRARY_DIR})
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
   ament_target_dependencies(${PROJECT_NAME}
