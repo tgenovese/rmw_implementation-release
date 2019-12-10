@@ -249,8 +249,9 @@ RMW_INTERFACE_FN(rmw_get_serialization_format,
 
 RMW_INTERFACE_FN(rmw_create_node,
   rmw_node_t *, nullptr,
-  5, ARG_TYPES(
-    rmw_context_t *, const char *, const char *, size_t, const rmw_node_security_options_t *))
+  6, ARG_TYPES(
+    rmw_context_t *, const char *, const char *, size_t, const rmw_node_security_options_t *,
+    bool))
 
 RMW_INTERFACE_FN(rmw_destroy_node,
   rmw_ret_t, RMW_RET_ERROR,
@@ -277,17 +278,32 @@ RMW_INTERFACE_FN(rmw_fini_publisher_allocation,
 
 RMW_INTERFACE_FN(rmw_create_publisher,
   rmw_publisher_t *, nullptr,
-  4, ARG_TYPES(
+  5, ARG_TYPES(
     const rmw_node_t *, const rosidl_message_type_support_t *, const char *,
-    const rmw_qos_profile_t *))
+    const rmw_qos_profile_t *, const rmw_publisher_options_t *))
 
 RMW_INTERFACE_FN(rmw_destroy_publisher,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(rmw_node_t *, rmw_publisher_t *))
 
+RMW_INTERFACE_FN(rmw_borrow_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    const rmw_publisher_t *,
+    const rosidl_message_type_support_t *,
+    void **))
+
+RMW_INTERFACE_FN(rmw_return_loaned_message_from_publisher,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_publisher_t *, void *))
+
 RMW_INTERFACE_FN(rmw_publish,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_publisher_t *, const void *, rmw_publisher_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_publish_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_publisher_t *, void *, rmw_publisher_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_publisher_count_matched_subscriptions,
   rmw_ret_t, RMW_RET_ERROR,
@@ -337,7 +353,7 @@ RMW_INTERFACE_FN(rmw_create_subscription,
   rmw_subscription_t *, nullptr,
   5, ARG_TYPES(
     const rmw_node_t *, const rosidl_message_type_support_t *, const char *,
-    const rmw_qos_profile_t *, bool))
+    const rmw_qos_profile_t *, const rmw_subscription_options_t *))
 
 RMW_INTERFACE_FN(rmw_destroy_subscription,
   rmw_ret_t, RMW_RET_ERROR,
@@ -346,6 +362,10 @@ RMW_INTERFACE_FN(rmw_destroy_subscription,
 RMW_INTERFACE_FN(rmw_subscription_count_matched_publishers,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_subscription_t *, size_t *))
+
+RMW_INTERFACE_FN(rmw_subscription_get_actual_qos,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_subscription_t *, rmw_qos_profile_t *))
 
 RMW_INTERFACE_FN(rmw_take,
   rmw_ret_t, RMW_RET_ERROR,
@@ -368,6 +388,21 @@ RMW_INTERFACE_FN(rmw_take_serialized_message_with_info,
   5, ARG_TYPES(
     const rmw_subscription_t *, rmw_serialized_message_t *, bool *, rmw_message_info_t *,
     rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_take_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    const rmw_subscription_t *, void **, bool *, rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_take_loaned_message_with_info,
+  rmw_ret_t, RMW_RET_ERROR,
+  5, ARG_TYPES(
+    const rmw_subscription_t *, void **, bool *, rmw_message_info_t *,
+    rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_return_loaned_message_from_subscription,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_subscription_t *, void *))
 
 RMW_INTERFACE_FN(rmw_create_client,
   rmw_client_t *, nullptr,
@@ -453,6 +488,12 @@ RMW_INTERFACE_FN(rmw_get_service_names_and_types_by_node,
     const rmw_node_t *, rcutils_allocator_t *, const char *, const char *,
     rmw_names_and_types_t *))
 
+RMW_INTERFACE_FN(rmw_get_client_names_and_types_by_node,
+  rmw_ret_t, RMW_RET_ERROR,
+  5, ARG_TYPES(
+    const rmw_node_t *, rcutils_allocator_t *, const char *, const char *,
+    rmw_names_and_types_t *))
+
 RMW_INTERFACE_FN(rmw_get_topic_names_and_types,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(
@@ -514,7 +555,10 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_fini_publisher_allocation);
   GET_SYMBOL(rmw_create_publisher)
   GET_SYMBOL(rmw_destroy_publisher)
+  GET_SYMBOL(rmw_borrow_loaned_message);
+  GET_SYMBOL(rmw_return_loaned_message_from_publisher);
   GET_SYMBOL(rmw_publish)
+  GET_SYMBOL(rmw_publish_loaned_message)
   GET_SYMBOL(rmw_publisher_count_matched_subscriptions)
   GET_SYMBOL(rmw_publisher_get_actual_qos);
   GET_SYMBOL(rmw_publish_serialized_message)
@@ -527,10 +571,14 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_create_subscription)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_subscription_count_matched_publishers);
+  GET_SYMBOL(rmw_subscription_get_actual_qos);
   GET_SYMBOL(rmw_take)
   GET_SYMBOL(rmw_take_with_info)
   GET_SYMBOL(rmw_take_serialized_message)
   GET_SYMBOL(rmw_take_serialized_message_with_info)
+  GET_SYMBOL(rmw_take_loaned_message)
+  GET_SYMBOL(rmw_take_loaned_message_with_info)
+  GET_SYMBOL(rmw_return_loaned_message_from_subscription)
   GET_SYMBOL(rmw_create_client)
   GET_SYMBOL(rmw_destroy_client)
   GET_SYMBOL(rmw_send_request)
@@ -549,6 +597,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_publisher_names_and_types_by_node)
   GET_SYMBOL(rmw_get_subscriber_names_and_types_by_node)
   GET_SYMBOL(rmw_get_service_names_and_types_by_node)
+  GET_SYMBOL(rmw_get_client_names_and_types_by_node)
   GET_SYMBOL(rmw_get_topic_names_and_types)
   GET_SYMBOL(rmw_get_service_names_and_types)
   GET_SYMBOL(rmw_get_node_names)
