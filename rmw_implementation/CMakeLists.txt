@@ -12,9 +12,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-
-find_package(rcutils REQUIRED)
-
 find_package(rmw_implementation_cmake REQUIRED)
 
 if(BUILD_TESTING)
@@ -28,15 +25,9 @@ message(STATUS "")
 message(STATUS "Default rmw implementation: '${RMW_IMPLEMENTATION}'")
 message(STATUS "")
 
-option(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING
-  "Force use of dynamic loading (via poco), even if there is only one implementation available"
-  OFF)
-
 get_available_rmw_implementations(available_rmw_implementations)
 list(LENGTH available_rmw_implementations count_available_rmw_implementations)
-if(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING)
-  set(rmw_implementation_disable_runtime_selection_default OFF)
-elseif(count_available_rmw_implementations EQUAL 1)
+if(count_available_rmw_implementations EQUAL 1)
   set(rmw_implementation_disable_runtime_selection_default ON)
 else()
   set(rmw_implementation_disable_runtime_selection_default OFF)
@@ -55,25 +46,26 @@ if(RMW_IMPLEMENTATION_DISABLE_RUNTIME_SELECTION)
 else()
   message(STATUS "Runtime selection of RMW enabled")
 
-  # provides FindPoco.cmake and Poco on platforms without it
-  find_package(poco_vendor REQUIRED)
-  find_package(Poco REQUIRED COMPONENTS Foundation)
+  find_package(rcpputils REQUIRED)
+  find_package(rcutils REQUIRED)
   find_package(rmw REQUIRED)
 
-  link_directories(${Poco_LIBRARY_DIR})
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
   ament_target_dependencies(${PROJECT_NAME}
-    "Poco"
+    "rcpputils"
+    "rcutils"
     "rmw")
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
   configure_rmw_library(${PROJECT_NAME})
 
   ament_export_libraries(${PROJECT_NAME})
+  ament_export_targets(${PROJECT_NAME})
+  ament_export_dependencies(rcpputils rcutils)
 
   install(
-    TARGETS ${PROJECT_NAME}
+    TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
