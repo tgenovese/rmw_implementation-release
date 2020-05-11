@@ -1,4 +1,4 @@
-From 7c45414fbe7a35dc4b6820119a12bb1da2780162 Mon Sep 17 00:00:00 2001
+From 1856510249a7ee0863676fb0f569f0e39804bfa4 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?= <steven@nuclearsandwich.com>
 Date: Fri, 16 Nov 2018 14:04:51 -0800
 Subject: [PATCH] Add runtime dependency on an rmw_implementation.
@@ -23,5 +23,5 @@ index 6d7b65c..75f8825 100644
  @[if Replaces]Replaces: @(', '.join(Replaces))@\n@[end if]@
  Description: @(Description)
 -- 
-2.26.1
+2.17.1
 
