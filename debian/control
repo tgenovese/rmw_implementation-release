@@ -1,0 +1,12 @@
+Source: ros-rolling-rmw-implementation
+Section: misc
+Priority: optional
+Maintainer: Dirk Thomas <dthomas@osrfoundation.org>
+Build-Depends: debhelper (>= 9.0.0), ros-rolling-ament-cmake, ros-rolling-ament-lint-auto, ros-rolling-ament-lint-common, ros-rolling-rcpputils, ros-rolling-rcutils, ros-rolling-rmw, ros-rolling-rmw-connext-cpp, ros-rolling-rmw-cyclonedds-cpp, ros-rolling-rmw-fastrtps-cpp, ros-rolling-rmw-implementation-cmake, ros-rolling-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-rolling-rmw-implementation
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-rolling-rcpputils, ros-rolling-rcutils, ros-rolling-rmw-implementation-cmake, ros-rolling-ros-workspace, ros-foxy-rmw-fastrtps-cpp | ros-foxy-rmw-connext-cpp
+Description: The decision which ROS middleware implementation should be used for C++.
