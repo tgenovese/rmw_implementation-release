@@ -1,1 +1,1 @@
-{"trim": "", "base": "0774956", "trimbase": "", "parent": "debian/foxy/rmw_implementation", "previous": "346dfb2"}
+{"base": "a41626d", "parent": "debian/rolling/rmw_implementation", "previous": "78b77be", "trim": "", "trimbase": ""}
