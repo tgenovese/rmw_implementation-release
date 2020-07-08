@@ -1,0 +1,11 @@
+ros-rolling-test-rmw-implementation (2.0.0-1focal) focal; urgency=high
+
+  * Add init options API test coverage. (#108 <https://github.com/ros2/rmw_implementation/issues/108>)
+  * Complete init/shutdown API test coverage. (#107 <https://github.com/ros2/rmw_implementation/issues/107>)
+  * Add dependency on ament_cmake_gtest (#109 <https://github.com/ros2/rmw_implementation/issues/109>)
+  * Add test_rmw_implementation package. (#106 <https://github.com/ros2/rmw_implementation/issues/106>)
+  * Contributors: Ivan Santiago Paunovic, Michel Hidalgo, Shane Loretz
+
+ -- Michel Hidalgo <michel@ekumenlabs.com>  Wed, 08 Jul 2020 00:00:00 -0000
+
+
