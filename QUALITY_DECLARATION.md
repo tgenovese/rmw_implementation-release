@@ -14,7 +14,8 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 
 ### Version Stability [1.ii]
 
-`rmw_implementation` is not yet at a stable version, i.e. >= 1.0.0.
+`rmw_implementation` is at a stable version, i.e. `>= 1.0.0`.
+The current version can be found in its [package.xml](rmw_implementation/package.xml), and its change history can be found in its [CHANGELOG](rmw_implementation/CHANGELOG.rst).
 
 ### Public API Declaration [1.iii]
 
@@ -65,7 +66,7 @@ Currently nightly results can be seen here:
 
 ### Feature Documentation [3.i]
 
-`rmw_implementation` does not have any feature documentation and it will be needed to reach higher quality levels.
+`rmw_implementation` features are documented in the repository level [README](README.md).
 
 ### Public API Documentation [3.ii]
 
@@ -89,11 +90,11 @@ Most recent test results can be found [here](http://build.ros2.org/view/Epr/job/
 
 ### Feature Testing [4.i]
 
-There are currently no public features undergoing tests.
+`rmw_implementation` features enable ROS middleware configuration. Integration and system tests against available `rmw` implementations up the stack, such as those found in [`test_rclcpp`](https://github.com/ros2/system_tests/tree/master/test_rclcpp) and [`test_communication`](https://github.com/ros2/system_tests/tree/master/test_communication) packages, provide coverage.
 
 ### Public API Testing [4.ii]
 
-`rmw_implementation` does not expose a public API. There are currently no tests for the public API.
+`rmw_implementation` does not expose a public API.
 
 ### Coverage [4.iii]
 
@@ -143,7 +144,7 @@ Currently nightly results can be seen here:
 
 ## Vulnerability Disclosure Policy [7.i]
 
-This package does not yet have a Vulnerability Disclosure Policy
+This package conforms to the Vulnerability Disclosure Policy in [REP-2006](https://www.ros.org/reps/rep-2006.html).
 
 # Current status Summary
 
