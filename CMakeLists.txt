@@ -58,11 +58,46 @@ else()
     "rmw")
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
+
+  # Causes the visibility macros to use dllexport rather than dllimport,
+  # which is appropriate when building the dll but not consuming it.
+  target_compile_definitions(${PROJECT_NAME} PRIVATE "RMW_IMPLEMENTATION_BUILDING_DLL")
+
+  if(BUILD_TESTING)
+    # Causes symbols to be exposed for tests to use.
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+      "RMW_IMPLEMENTATION_DEFAULT_VISIBILITY=RMW_IMPLEMENTATION_PUBLIC")
+  endif()
+
   configure_rmw_library(${PROJECT_NAME})
 
   ament_export_libraries(${PROJECT_NAME})
   ament_export_targets(${PROJECT_NAME})
   ament_export_dependencies(rcpputils rcutils)
+
+  if(BUILD_TESTING)
+    find_package(ament_cmake_gtest REQUIRED)
+    ament_add_gtest(test_functions test/test_functions.cpp)
+    ament_target_dependencies(test_functions rcutils rmw)
+    target_link_libraries(test_functions ${PROJECT_NAME})
+
+    find_package(performance_test_fixture REQUIRED)
+    # Give cppcheck hints about macro definitions coming from outside this package
+    get_target_property(ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS performance_test_fixture::performance_test_fixture INTERFACE_INCLUDE_DIRECTORIES)
+
+    macro(benchmark_rmws)
+      find_package(${rmw_implementation} REQUIRED)
+      message(STATUS "Creating API tests for '${rmw_implementation}'")
+      set(rmw_implementation_env_var RMW_IMPLEMENTATION=${rmw_implementation})
+
+      add_performance_test(benchmark_symbols${target_suffix} test/benchmark/benchmark_symbols.cpp
+        ENV ${rmw_implementation_env_var})
+      if(TARGET benchmark_symbols${target_suffix})
+        target_link_libraries(benchmark_symbols${target_suffix} ${PROJECT_NAME})
+      endif()
+    endmacro()
+    call_for_each_rmw_implementation(benchmark_rmws)
+  endif()
 
   install(
     TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
