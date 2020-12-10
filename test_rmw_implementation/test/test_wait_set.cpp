@@ -109,7 +109,7 @@ protected:
     Base::SetUp();
     constexpr char node_name[] = "my_node";
     constexpr char node_namespace[] = "/my_ns";
-    node = rmw_create_node(&context, node_name, node_namespace, 0, false);
+    node = rmw_create_node(&context, node_name, node_namespace);
     ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
     constexpr char topic_name[] = "/test";
     const rosidl_message_type_support_t * message_ts =
@@ -144,6 +144,7 @@ protected:
     ret = rmw_destroy_guard_condition(gc);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     ret = rmw_destroy_node(node);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     Base::TearDown();
   }
 

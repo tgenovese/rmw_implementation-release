@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "./functions.hpp"
+
 #include <cstddef>
 #include <stdexcept>
 
@@ -39,65 +41,97 @@
 #define STRINGIFY_(s) #s
 #define STRINGIFY(s) STRINGIFY_(s)
 
+static std::shared_ptr<rcpputils::SharedLibrary> g_rmw_lib = nullptr;
+
+std::shared_ptr<rcpputils::SharedLibrary>
+load_library()
+{
+  std::string env_var;
+  try {
+    env_var = rcpputils::get_env_var("RMW_IMPLEMENTATION");
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to fetch RMW_IMPLEMENTATION "
+      "from environment due to %s", e.what());
+    return nullptr;
+  }
+
+  if (env_var.empty()) {
+    env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
+  }
+
+  std::string library_path;
+  try {
+    library_path = rcpputils::find_library_path(env_var);
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to find shared library due to %s", e.what());
+    return nullptr;
+  }
+
+  if (library_path.empty()) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to find shared library '%s'",
+      env_var.c_str());
+    return nullptr;
+  }
+
+  try {
+    return std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to load shared library '%s' due to %s",
+      library_path.c_str(), e.what());
+    return nullptr;
+  }
+}
+
 std::shared_ptr<rcpputils::SharedLibrary>
 get_library()
 {
-  static std::shared_ptr<rcpputils::SharedLibrary> lib;
-
-  if (!lib) {
-    std::string env_var = rcpputils::get_env_var("RMW_IMPLEMENTATION");
-    if (env_var.empty()) {
-      env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
-    }
-    std::string library_path = rcpputils::find_library_path(env_var);
-    if (library_path.empty()) {
-      RMW_SET_ERROR_MSG(
-        ("failed to find shared library of rmw implementation. Searched " + env_var).c_str());
-      return nullptr;
-    }
-
-    try {
-      lib = std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
-    } catch (const std::runtime_error & e) {
-      RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation: " + library_path +
-        " Exception: " + std::string(e.what())).c_str());
-      return nullptr;
-    } catch (const std::bad_alloc & e) {
-      RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation " + library_path + ": " +
-        std::string(e.what())).c_str());
-      return nullptr;
-    }
+  if (!g_rmw_lib) {
+    g_rmw_lib = load_library();
   }
-  return lib;
+  return g_rmw_lib;
+}
+
+void *
+lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const std::string & symbol_name)
+{
+  if (!lib) {
+    if (!rmw_error_is_set()) {
+      RMW_SET_ERROR_MSG("no shared library to lookup");
+    }  // else assume library loading failed
+    return nullptr;
+  }
+
+  if (!lib->has_symbol(symbol_name)) {
+    try {
+      std::string library_path = lib->get_library_path();
+      RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+        "failed to resolve symbol '%s' in shared library '%s'",
+        symbol_name.c_str(), library_path.c_str());
+    } catch (const std::exception & e) {
+      RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+        "failed to resolve symbol '%s' in shared library due to %s",
+        symbol_name.c_str(), e.what());
+    }
+    return nullptr;
+  }
+  return lib->get_symbol(symbol_name);
 }
 
 void *
 get_symbol(const char * symbol_name)
 {
-  std::shared_ptr<rcpputils::SharedLibrary> lib = get_library();
-
-  if (!lib) {
-    // error message set by get_library()
+  try {
+    return lookup_symbol(get_library(), symbol_name);
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to get symbol '%s' due to %s",
+      symbol_name, e.what());
     return nullptr;
   }
-
-  if (!lib->has_symbol(symbol_name)) {
-    rcutils_allocator_t allocator = rcutils_get_default_allocator();
-    char * msg = rcutils_format_string(
-      allocator,
-      "failed to resolve symbol '%s' in shared library '%s'", symbol_name,
-      lib->get_library_path().c_str());
-    if (msg) {
-      RMW_SET_ERROR_MSG(msg);
-      allocator.deallocate(msg, allocator.state);
-    } else {
-      RMW_SET_ERROR_MSG("failed to allocate memory for error message");
-    }
-    return nullptr;
-  }
-  return lib->get_symbol(symbol_name);
 }
 
 #ifdef __cplusplus
@@ -188,8 +222,8 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_create_node,
   rmw_node_t *, nullptr,
-  5, ARG_TYPES(
-    rmw_context_t *, const char *, const char *, size_t, bool))
+  3, ARG_TYPES(
+    rmw_context_t *, const char *, const char *))
 
 RMW_INTERFACE_FN(
   rmw_destroy_node,
@@ -673,3 +707,82 @@ rmw_init(const rmw_init_options_t * options, rmw_context_t * context)
 #ifdef __cplusplus
 }
 #endif
+
+void
+unload_library()
+{
+  symbol_rmw_get_implementation_identifier = nullptr;
+  symbol_rmw_init_options_init = nullptr;
+  symbol_rmw_init_options_copy = nullptr;
+  symbol_rmw_init_options_fini = nullptr;
+  symbol_rmw_shutdown = nullptr;
+  symbol_rmw_context_fini = nullptr;
+  symbol_rmw_get_serialization_format = nullptr;
+  symbol_rmw_create_node = nullptr;
+  symbol_rmw_destroy_node = nullptr;
+  symbol_rmw_node_get_graph_guard_condition = nullptr;
+  symbol_rmw_init_publisher_allocation = nullptr;
+  symbol_rmw_fini_publisher_allocation = nullptr;
+  symbol_rmw_create_publisher = nullptr;
+  symbol_rmw_destroy_publisher = nullptr;
+  symbol_rmw_borrow_loaned_message = nullptr;
+  symbol_rmw_return_loaned_message_from_publisher = nullptr;
+  symbol_rmw_publish = nullptr;
+  symbol_rmw_publish_loaned_message = nullptr;
+  symbol_rmw_publisher_count_matched_subscriptions = nullptr;
+  symbol_rmw_publisher_get_actual_qos = nullptr;
+  symbol_rmw_publisher_event_init = nullptr;
+  symbol_rmw_publish_serialized_message = nullptr;
+  symbol_rmw_get_serialized_message_size = nullptr;
+  symbol_rmw_publisher_assert_liveliness = nullptr;
+  symbol_rmw_serialize = nullptr;
+  symbol_rmw_deserialize = nullptr;
+  symbol_rmw_init_subscription_allocation = nullptr;
+  symbol_rmw_fini_subscription_allocation = nullptr;
+  symbol_rmw_create_subscription = nullptr;
+  symbol_rmw_destroy_subscription = nullptr;
+  symbol_rmw_subscription_count_matched_publishers = nullptr;
+  symbol_rmw_subscription_get_actual_qos = nullptr;
+  symbol_rmw_subscription_event_init = nullptr;
+  symbol_rmw_take = nullptr;
+  symbol_rmw_take_sequence = nullptr;
+  symbol_rmw_take_with_info = nullptr;
+  symbol_rmw_take_serialized_message = nullptr;
+  symbol_rmw_take_serialized_message_with_info = nullptr;
+  symbol_rmw_take_loaned_message = nullptr;
+  symbol_rmw_take_loaned_message_with_info = nullptr;
+  symbol_rmw_return_loaned_message_from_subscription = nullptr;
+  symbol_rmw_create_client = nullptr;
+  symbol_rmw_destroy_client = nullptr;
+  symbol_rmw_send_request = nullptr;
+  symbol_rmw_take_response = nullptr;
+  symbol_rmw_create_service = nullptr;
+  symbol_rmw_destroy_service = nullptr;
+  symbol_rmw_take_request = nullptr;
+  symbol_rmw_send_response = nullptr;
+  symbol_rmw_take_event = nullptr;
+  symbol_rmw_create_guard_condition = nullptr;
+  symbol_rmw_destroy_guard_condition = nullptr;
+  symbol_rmw_trigger_guard_condition = nullptr;
+  symbol_rmw_create_wait_set = nullptr;
+  symbol_rmw_destroy_wait_set = nullptr;
+  symbol_rmw_wait = nullptr;
+  symbol_rmw_get_publisher_names_and_types_by_node = nullptr;
+  symbol_rmw_get_subscriber_names_and_types_by_node = nullptr;
+  symbol_rmw_get_service_names_and_types_by_node = nullptr;
+  symbol_rmw_get_client_names_and_types_by_node = nullptr;
+  symbol_rmw_get_topic_names_and_types = nullptr;
+  symbol_rmw_get_service_names_and_types = nullptr;
+  symbol_rmw_get_node_names = nullptr;
+  symbol_rmw_get_node_names_with_enclaves = nullptr;
+  symbol_rmw_count_publishers = nullptr;
+  symbol_rmw_count_subscribers = nullptr;
+  symbol_rmw_get_gid_for_publisher = nullptr;
+  symbol_rmw_compare_gids_equal = nullptr;
+  symbol_rmw_service_server_is_available = nullptr;
+  symbol_rmw_set_log_severity = nullptr;
+  symbol_rmw_get_publishers_info_by_topic = nullptr;
+  symbol_rmw_get_subscriptions_info_by_topic = nullptr;
+  symbol_rmw_init = nullptr;
+  g_rmw_lib.reset();
+}
