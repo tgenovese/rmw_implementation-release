@@ -2,6 +2,9 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.1 (2021-01-25)
+------------------
+
 2.1.0 (2020-12-10)
 ------------------
 * Add some additional checking that cleanup happens. (`#168 <https://github.com/ros2/rmw_implementation/issues/168>`_)
