@@ -1,7 +1,7 @@
-From 13e5596cdf926305ba1f2e47a4d68918ae4efa22 Mon Sep 17 00:00:00 2001
+From 9f44388bc8838f86161b8ce568a8850a39fb8fcc Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?= <steven@nuclearsandwich.com>
 Date: Wed, 17 Jun 2020 02:22:15 +0000
-Subject: [PATCH 2/2] Update patches to depend on rolling instead of foxy.
+Subject: [PATCH 2/3] Update patches to depend on rolling instead of foxy.
 
 ---
  debian/control.em | 2 +-
