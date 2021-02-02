@@ -1,4 +1,4 @@
-From a0bc4944970c5c146e5af3e15fe6d65e9f5ba02c Mon Sep 17 00:00:00 2001
+From fac892ed99044f495c0776ea12ded36a5a0f812c Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Mon, 1 Feb 2021 18:13:32 -0800
 Subject: [PATCH] Resolve rmw_implementation_packages dependencies
@@ -28,16 +28,16 @@ index 3e4ec67..037b101 100644
    <build_depend>rmw_fastrtps_cpp</build_depend>
    <!-- end of group dependencies added for bloom -->
 diff --git a/rpm/template.spec.em b/rpm/template.spec.em
-index c0d00ea..1e1ad52 100644
+index c0d00ea..6cac3c2 100644
 --- a/rpm/template.spec.em
 +++ b/rpm/template.spec.em
 @@ -15,6 +15,10 @@ License:        @(License)
  Source0:        %{name}-%{version}.tar.gz
  @[if NoArch]@\nBuildArch:      noarch@\n@[end if]@
  
-+Requires:       ros-eloquent-rmw-implementation-packages(member)
++Requires:       ros-rolling-rmw-implementation-packages(member)
 +%if 0%{?with_weak_deps}
-+Suggests:       ros-eloquent-rmw-cyclonedds-cpp
++Suggests:       ros-rolling-rmw-cyclonedds-cpp
 +%endif
  @[for p in Depends]Requires:       @p@\n@[end for]@
  @[for p in BuildDepends]BuildRequires:  @p@\n@[end for]@
