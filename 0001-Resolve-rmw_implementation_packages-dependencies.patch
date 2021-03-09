@@ -1,4 +1,4 @@
-From 018219549af0d2929ce9ad8b1ae297b12883992a Mon Sep 17 00:00:00 2001
+From 92f6d62c18e92b429be205c9d7713fe810d79a1e Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Mon, 1 Feb 2021 18:13:32 -0800
 Subject: [PATCH] Resolve rmw_implementation_packages dependencies
@@ -16,7 +16,7 @@ Signed-off-by: Scott K Logan <logans@cottsay.net>
  2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/package.xml b/package.xml
-index 3e4ec67..037b101 100644
+index fd0fa7d..e48fb33 100644
 --- a/package.xml
 +++ b/package.xml
 @@ -20,7 +20,6 @@
@@ -26,9 +26,9 @@ index 3e4ec67..037b101 100644
 -  <build_depend>rmw_connext_cpp</build_depend>
    <build_depend>rmw_cyclonedds_cpp</build_depend>
    <build_depend>rmw_fastrtps_cpp</build_depend>
-   <!-- end of group dependencies added for bloom -->
+   <build_depend>rmw_fastrtps_dynamic_cpp</build_depend>
 diff --git a/rpm/template.spec.em b/rpm/template.spec.em
-index c0d00ea..6cac3c2 100644
+index f723150..2bbf93e 100644
 --- a/rpm/template.spec.em
 +++ b/rpm/template.spec.em
 @@ -15,6 +15,10 @@ License:        @(License)
@@ -43,5 +43,5 @@ index c0d00ea..6cac3c2 100644
  @[for p in BuildDepends]BuildRequires:  @p@\n@[end for]@
  @[for p in Conflicts]Conflicts:      @p@\n@[end for]@
 -- 
-2.25.1
+2.29.2
 
