@@ -1,44 +1,29 @@
-From 92f6d62c18e92b429be205c9d7713fe810d79a1e Mon Sep 17 00:00:00 2001
+From 9b2b1f6fbcd0205cacbf8028de07c13e5739f1e3 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
-Date: Mon, 1 Feb 2021 18:13:32 -0800
-Subject: [PATCH] Resolve rmw_implementation_packages dependencies
+Date: Tue, 9 Mar 2021 15:57:20 -0800
+Subject: [PATCH 1/2] Resolve rmw_implementation_packages dependencies
 
 Require any RMW implementation at runtime, and suggest the default RMW,
 `rmw_cyclonedds_cpp` if weak dependencies are supported.
 
-Also drop Connext, since that RMW is not supported for any RHEL
-distributions at this time.
-
 Signed-off-by: Scott K Logan <logans@cottsay.net>
 ---
- package.xml          | 1 -
- rpm/template.spec.em | 4 ++++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ rpm/template.spec.em | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/package.xml b/package.xml
-index fd0fa7d..e48fb33 100644
---- a/package.xml
-+++ b/package.xml
-@@ -20,7 +20,6 @@
-   Bloom does not support group_depend so entries below duplicate the group rmw_implementation_packages.
-   This ensures that binary packages have support for all of these rmw impl. enabled.
-   -->
--  <build_depend>rmw_connext_cpp</build_depend>
-   <build_depend>rmw_cyclonedds_cpp</build_depend>
-   <build_depend>rmw_fastrtps_cpp</build_depend>
-   <build_depend>rmw_fastrtps_dynamic_cpp</build_depend>
 diff --git a/rpm/template.spec.em b/rpm/template.spec.em
-index f723150..2bbf93e 100644
+index f723150..82bd654 100644
 --- a/rpm/template.spec.em
 +++ b/rpm/template.spec.em
-@@ -15,6 +15,10 @@ License:        @(License)
+@@ -15,6 +15,11 @@ License:        @(License)
  Source0:        %{name}-%{version}.tar.gz
  @[if NoArch]@\nBuildArch:      noarch@\n@[end if]@
  
-+Requires:       ros-rolling-rmw-implementation-packages(member)
++Requires:       ros-@(Rosdistro)-rmw-implementation-packages(member)
 +%if 0%{?with_weak_deps}
-+Suggests:       ros-rolling-rmw-cyclonedds-cpp
++Suggests:       ros-@(Rosdistro)-rmw-cyclonedds-cpp
 +%endif
++
  @[for p in Depends]Requires:       @p@\n@[end for]@
  @[for p in BuildDepends]BuildRequires:  @p@\n@[end for]@
  @[for p in Conflicts]Conflicts:      @p@\n@[end for]@
