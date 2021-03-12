@@ -1,4 +1,4 @@
-From 3bb357c48b2dc4c54711a6f5f10819198f5e122f Mon Sep 17 00:00:00 2001
+From f924137f3d39c9933927bf1c52604e342c20fb60 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?= <steven@nuclearsandwich.com>
 Date: Wed, 17 Jun 2020 02:22:15 +0000
 Subject: [PATCH 2/3] Update patches to depend on rolling instead of foxy.
