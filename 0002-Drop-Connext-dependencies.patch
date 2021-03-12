@@ -1,39 +1,36 @@
-From 5bcda2474dea88f93333edaeaadc764621fdf78f Mon Sep 17 00:00:00 2001
+From 205012e16bc930da2774facbeea8673d133e0cc6 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Tue, 9 Mar 2021 16:07:42 -0800
-Subject: [PATCH 2/2] Drop FastRTPS and Connext dependencies
+Subject: [PATCH 2/2] Drop Connext dependencies
 
-These RMWs aren't available for RHEL.
+This RMW isn't available for RHEL.
 
 Signed-off-by: Scott K Logan <logans@cottsay.net>
 ---
- package.xml          | 3 ---
+ package.xml          | 1 -
  rpm/template.spec.em | 4 ++++
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/package.xml b/package.xml
-index fd0fa7d..3101a3a 100644
+index fd0fa7d..e48fb33 100644
 --- a/package.xml
 +++ b/package.xml
-@@ -20,10 +20,7 @@
+@@ -20,7 +20,6 @@
    Bloom does not support group_depend so entries below duplicate the group rmw_implementation_packages.
    This ensures that binary packages have support for all of these rmw impl. enabled.
    -->
 -  <build_depend>rmw_connext_cpp</build_depend>
    <build_depend>rmw_cyclonedds_cpp</build_depend>
--  <build_depend>rmw_fastrtps_cpp</build_depend>
--  <build_depend>rmw_fastrtps_dynamic_cpp</build_depend>
-   <!-- end of group dependencies added for bloom -->
- 
-   <depend>rmw_implementation_cmake</depend>
+   <build_depend>rmw_fastrtps_cpp</build_depend>
+   <build_depend>rmw_fastrtps_dynamic_cpp</build_depend>
 diff --git a/rpm/template.spec.em b/rpm/template.spec.em
-index 82bd654..3f5de29 100644
+index 82bd654..0e8f434 100644
 --- a/rpm/template.spec.em
 +++ b/rpm/template.spec.em
 @@ -1,3 +1,7 @@
 +@{
-+# FastRTPS nor Connext are available for RHEL - ignore any deps related to them
-+BuildDepends = [d for d in BuildDepends if not any(x for x in ['connext', 'fastrtps'] if x in d)]
++# Connext is not available for RHEL - ignore any deps related to it
++BuildDepends = [d for d in BuildDepends if 'connext' not in d]
 +}@
  %bcond_without tests
  %bcond_without weak_deps
