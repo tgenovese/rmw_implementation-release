@@ -1,4 +1,4 @@
-From 47064abaa49d2120a8b4682bfe2ebbfd79afb1ed Mon Sep 17 00:00:00 2001
+From 16f9c01db66b2c2bae6a9241913d77af6c8304d0 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?= <steven@nuclearsandwich.com>
 Date: Wed, 17 Jun 2020 02:22:15 +0000
 Subject: [PATCH 2/3] Update patches to depend on rolling instead of foxy.
@@ -21,5 +21,5 @@ index 75f8825..b82e69a 100644
  @[if Replaces]Replaces: @(', '.join(Replaces))@\n@[end if]@
  Description: @(Description)
 -- 
-2.30.2
+2.25.1
 
