@@ -54,7 +54,7 @@ protected:
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     constexpr char node_name[] = "my_test_node";
     constexpr char node_namespace[] = "/my_test_ns";
-    node = rmw_create_node(&context, node_name, node_namespace);
+    node = rmw_create_node(&context, node_name, node_namespace, 1, false);
     ASSERT_NE(nullptr, node) << rcutils_get_error_string().str;
   }
 
@@ -384,8 +384,8 @@ TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available
 
 TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available_good_args)
 {
-  bool is_available = false;
-  rmw_ret_t ret = RMW_RET_ERROR;
+  bool is_available;
+  rmw_ret_t ret;
   SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
     ret = rmw_service_server_is_available(node, client, &is_available);
     if (RMW_RET_OK == ret && is_available) {

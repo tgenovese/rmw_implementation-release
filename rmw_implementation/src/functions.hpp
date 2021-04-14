@@ -16,7 +16,6 @@
 #define FUNCTIONS_HPP_
 
 #include <memory>
-#include <string>
 
 #include "rcpputils/shared_library.hpp"
 
@@ -26,9 +25,7 @@ RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
 std::shared_ptr<rcpputils::SharedLibrary> load_library();
 
 RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
-void * lookup_symbol(
-  std::shared_ptr<rcpputils::SharedLibrary> lib,
-  const std::string & symbol_name);
+void * lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const char * symbol_name);
 
 #ifdef __cplusplus
 extern "C"
