@@ -2,6 +2,9 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.4.1 (2021-04-16)
+------------------
+
 2.4.0 (2021-04-06)
 ------------------
 * Unique network flows (`#170 <https://github.com/ros2/rmw_implementation/issues/170>`_)
