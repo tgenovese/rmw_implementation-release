@@ -1,1 +1,1 @@
-{"base": "c79d8f7", "parent": "debian/rolling/rmw_implementation", "previous": "35bac7d", "trim": "", "trimbase": ""}
+{"base": "6ad46f4", "parent": "debian/galactic/rmw_implementation", "previous": "b93cb50", "trim": "", "trimbase": ""}
