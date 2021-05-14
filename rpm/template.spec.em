@@ -1,7 +1,3 @@
-@{
-# Connext is not available for RHEL - ignore any deps related to it
-BuildDepends = [d for d in BuildDepends if 'connext' not in d]
-}@
 %bcond_without tests
 %bcond_without weak_deps
 
