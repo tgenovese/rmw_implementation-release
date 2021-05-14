@@ -1,4 +1,4 @@
-From 06675755bea88f31686fcece1cc09e8bdffe04b0 Mon Sep 17 00:00:00 2001
+From ccd93a3da2a0f2622f590922ae859429b09615f1 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Tue, 9 Mar 2021 15:57:20 -0800
 Subject: [PATCH 1/2] Resolve rmw_implementation_packages dependencies
@@ -12,7 +12,7 @@ Signed-off-by: Scott K Logan <logans@cottsay.net>
  1 file changed, 5 insertions(+)
 
 diff --git a/rpm/template.spec.em b/rpm/template.spec.em
-index 836b2af..52afd3f 100644
+index 836b2af..b71a036 100644
 --- a/rpm/template.spec.em
 +++ b/rpm/template.spec.em
 @@ -15,6 +15,11 @@ License:        @(License)
@@ -21,12 +21,12 @@ index 836b2af..52afd3f 100644
  
 +Requires:       ros-@(Rosdistro)-rmw-implementation-packages(member)
 +%if 0%{?with_weak_deps}
-+Suggests:       ros-@(Rosdistro)-rmw-cyclonedds-cpp
++Recommends:     ros-@(Rosdistro)-rmw-cyclonedds-cpp
 +%endif
 +
  @[for p in Depends]Requires:       @p@\n@[end for]@
  @[for p in BuildDepends]BuildRequires:  @p@\n@[end for]@
  @[for p in Conflicts]Conflicts:      @p@\n@[end for]@
 -- 
-2.30.2
+2.31.1
 
