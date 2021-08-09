@@ -2,6 +2,17 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.6.0 (2021-08-09)
+------------------
+* Add rmw_publisher_wait_for_all_acked. (`#188 <https://github.com/ros2/rmw_implementation/issues/188>`_)
+* Contributors: Barry Xu
+
+2.5.0 (2021-05-05)
+------------------
+* Attempt to load any available RMW implementation. (`#189 <https://github.com/ros2/rmw_implementation/issues/189>`_)
+* Update includes after rcutils/get_env.h deprecation (`#190 <https://github.com/ros2/rmw_implementation/issues/190>`_)
+* Contributors: Chris Lalancette, Christophe Bedard
+
 2.4.1 (2021-04-16)
 ------------------
 
