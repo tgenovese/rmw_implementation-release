@@ -12,7 +12,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(ament_index_cpp REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 
 if(BUILD_TESTING)
@@ -53,12 +52,10 @@ else()
 
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
-  target_link_libraries(${PROJECT_NAME} PUBLIC
-    rmw::rmw)
-  target_link_libraries(${PROJECT_NAME} PRIVATE
-    ament_index_cpp::ament_index_cpp
-    rcpputils::rcpputils
-    rcutils::rcutils)
+  ament_target_dependencies(${PROJECT_NAME}
+    "rcpputils"
+    "rcutils"
+    "rmw")
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
 
@@ -74,23 +71,19 @@ else()
 
   configure_rmw_library(${PROJECT_NAME})
 
-  ament_export_targets(export_${PROJECT_NAME})
-  ament_export_dependencies(ament_index_cpp rcpputils rcutils)
+  ament_export_libraries(${PROJECT_NAME})
+  ament_export_targets(${PROJECT_NAME})
+  ament_export_dependencies(rcpputils rcutils)
 
   if(BUILD_TESTING)
     find_package(ament_cmake_gtest REQUIRED)
     ament_add_gtest(test_functions test/test_functions.cpp)
     ament_target_dependencies(test_functions rcutils rmw)
-    target_link_libraries(test_functions
-      ${PROJECT_NAME}
-      ament_index_cpp::ament_index_cpp
-      rcpputils::rcpputils
-      rcutils::rcutils)
+    target_link_libraries(test_functions ${PROJECT_NAME})
 
     find_package(performance_test_fixture REQUIRED)
     # Give cppcheck hints about macro definitions coming from outside this package
-    get_target_property(ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS performance_test_fixture::performance_test_fixture
-      INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS performance_test_fixture::performance_test_fixture INTERFACE_INCLUDE_DIRECTORIES)
 
     macro(benchmark_rmws)
       find_package(${rmw_implementation} REQUIRED)
@@ -100,18 +93,14 @@ else()
       add_performance_test(benchmark_symbols${target_suffix} test/benchmark/benchmark_symbols.cpp
         ENV ${rmw_implementation_env_var})
       if(TARGET benchmark_symbols${target_suffix})
-        target_link_libraries(benchmark_symbols${target_suffix}
-          ${PROJECT_NAME}
-          ament_index_cpp::ament_index_cpp
-          rcpputils::rcpputils
-          rcutils::rcutils)
+        target_link_libraries(benchmark_symbols${target_suffix} ${PROJECT_NAME})
       endif()
     endmacro()
     call_for_each_rmw_implementation(benchmark_rmws)
   endif()
 
   install(
-    TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME}
+    TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin

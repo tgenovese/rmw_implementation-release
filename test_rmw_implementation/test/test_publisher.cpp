@@ -51,7 +51,7 @@ protected:
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     constexpr char node_name[] = "my_test_node";
     constexpr char node_namespace[] = "/my_test_ns";
-    node = rmw_create_node(&context, node_name, node_namespace);
+    node = rmw_create_node(&context, node_name, node_namespace, 1, true);
     ASSERT_NE(nullptr, node) << rcutils_get_error_string().str;
   }
 
@@ -525,15 +525,6 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), publish_serialized_with_
       rmw_reset_error();
     }
   });
-}
-
-TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), wait_for_all_acked_with_best_effort) {
-  // For best effort, alway return RMW_RET_OK immediately
-  rmw_ret_t ret = rmw_publisher_wait_for_all_acked(pub, {0, 0});
-  EXPECT_EQ(ret, RMW_RET_OK);
-
-  ret = rmw_publisher_wait_for_all_acked(nullptr, {0, 0});
-  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
 }
 
 

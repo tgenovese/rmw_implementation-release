@@ -24,7 +24,6 @@
 #include "rmw/error_handling.h"
 
 #include "test_msgs/msg/basic_types.h"
-#include "test_msgs/msg/strings.h"
 #include "./config.hpp"
 #include "./testing_macros.hpp"
 
@@ -52,7 +51,7 @@ protected:
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     constexpr char node_name[] = "my_test_node";
     constexpr char node_namespace[] = "/my_test_ns";
-    node = rmw_create_node(&context, node_name, node_namespace);
+    node = rmw_create_node(&context, node_name, node_namespace, 1, true);
     ASSERT_NE(nullptr, node) << rcutils_get_error_string().str;
   }
 
@@ -524,107 +523,6 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_with_info_with_b
   sub->implementation_identifier = implementation_identifier;
 }
 
-TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), ignore_local_publications) {
-  rmw_ret_t ret;
-  bool taken = false;
-
-  // Create publisher
-  rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
-  rmw_publisher_t * pub = rmw_create_publisher(node, ts, topic_name, &qos_profile, &pub_options);
-  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
-  });
-
-  // Create subscription with ignore_local_publications = true
-  rmw_subscription_options_t sub_options_ignorelocal = rmw_get_default_subscription_options();
-  sub_options_ignorelocal.ignore_local_publications = true;
-  rmw_subscription_t * sub_ignorelocal =
-    rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options_ignorelocal);
-  ASSERT_NE(nullptr, sub_ignorelocal) << rmw_get_error_string().str;
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    EXPECT_EQ(
-      RMW_RET_OK, rmw_destroy_subscription(node, sub_ignorelocal)) << rmw_get_error_string().str;
-  });
-
-  size_t subscription_count = 0u;
-  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
-    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
-    if (RMW_RET_OK == ret && 2u == subscription_count) {  // Early return on failure.
-      break;
-    }
-  }
-
-  // Roundtrip message from publisher to both subscriptions
-  test_msgs__msg__BasicTypes original_message{};
-  ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&original_message));
-  original_message.bool_value = true;
-  original_message.char_value = 'k';
-  original_message.float32_value = 3.14159f;
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    test_msgs__msg__BasicTypes__fini(&original_message);
-  });
-
-  rmw_publisher_allocation_t * null_allocation_p{nullptr};
-  rmw_subscription_allocation_t * null_allocation_s{nullptr};
-
-  ret = rmw_publish(pub, &original_message, null_allocation_p);
-  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-
-  rmw_subscriptions_t subscriptions;
-  void * subscriptions_storage[2];
-  subscriptions_storage[0] = sub_ignorelocal->data;
-  subscriptions_storage[1] = sub->data;
-  subscriptions.subscribers = subscriptions_storage;
-  subscriptions.subscriber_count = 2;
-
-  rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 2);
-  ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    EXPECT_EQ(
-      RMW_RET_OK, rmw_destroy_wait_set(wait_set)) << rmw_get_error_string().str;
-  });
-  rmw_time_t timeout = {1, 0};  // 1000ms
-  ret = rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout);
-  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  // Subscriptions that ignore local publications may or may not be awaken by locally sent messages.
-  // ASSERT_NE(nullptr, subscriptions.subscribers[0]);
-  ASSERT_NE(nullptr, subscriptions.subscribers[1]);
-
-  // ignore_local_publications = true
-  {
-    test_msgs__msg__BasicTypes output_message{};
-    ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&output_message));
-    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-    {
-      test_msgs__msg__BasicTypes__fini(&output_message);
-    });
-
-    ret = rmw_take(sub_ignorelocal, &output_message, &taken, null_allocation_s);
-    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-    EXPECT_FALSE(taken);
-  }
-
-  // ignore_local_publications = false
-  {
-    test_msgs__msg__BasicTypes output_message{};
-    ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&output_message));
-    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-    {
-      test_msgs__msg__BasicTypes__fini(&output_message);
-    });
-
-    ret = rmw_take(sub, &output_message, &taken, null_allocation_s);
-    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-    EXPECT_TRUE(taken);
-    EXPECT_EQ(original_message, output_message);
-  }
-}
-
 TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence) {
   size_t count = 1u;
   size_t taken = 10u;  // Non-zero value to check variable update
@@ -632,12 +530,6 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence) {
   rmw_message_sequence_t sequence = rmw_get_zero_initialized_message_sequence();
   rmw_ret_t ret = rmw_message_sequence_init(&sequence, count, &allocator);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-
-  auto seq = test_msgs__msg__Strings__Sequence__create(count);
-  for (size_t ii = 0; ii < count; ++ii) {
-    sequence.data[ii] = &seq->data[ii];
-  }
-
   rmw_message_info_sequence_t info_sequence = rmw_get_zero_initialized_message_info_sequence();
   ret = rmw_message_info_sequence_init(&info_sequence, count, &allocator);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -647,13 +539,11 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence) {
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(taken, 0u);
 
-  ret = rmw_message_info_sequence_fini(&info_sequence);
-  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-
   ret = rmw_message_sequence_fini(&sequence);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
-  test_msgs__msg__Strings__Sequence__destroy(seq);
+  ret = rmw_message_info_sequence_fini(&info_sequence);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
 TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence_with_bad_args) {
@@ -909,112 +799,23 @@ protected:
 };
 
 TEST_F(CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message) {
-  bool taken = false;
-  void * loaned_message = nullptr;
-  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
-  rmw_ret_t ret = rmw_take_loaned_message(nullptr, &loaned_message, &taken, null_allocation);
-  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-  EXPECT_EQ(nullptr, loaned_message);
-  EXPECT_FALSE(taken);
-
-  ret = rmw_take_loaned_message(sub, nullptr, &taken, null_allocation);
-  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-  EXPECT_EQ(nullptr, loaned_message);
-  EXPECT_FALSE(taken);
-
-  ret = rmw_take_loaned_message(sub, &loaned_message, nullptr, null_allocation);
-  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-  EXPECT_EQ(nullptr, loaned_message);
-  EXPECT_FALSE(taken);
-
-  ret = rmw_take_loaned_message(sub, &loaned_message, &taken, null_allocation);
-  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  EXPECT_EQ(nullptr, loaned_message);
-  EXPECT_FALSE(taken);
-
-  const char * implementation_identifier = sub->implementation_identifier;
-  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
-  ret = rmw_take_loaned_message(sub, &loaned_message, &taken, null_allocation);
-  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-  sub->implementation_identifier = implementation_identifier;
+  // TODO(lobotuerk): add tests for rmw_take_loaned_message() when we have an implementation.
+  FAIL() << "Not implemented";
 }
 
 TEST_F(
   CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message_with_info) {
-  bool taken = false;
-  void * loaned_message = nullptr;
-  rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
-  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
-  rmw_ret_t ret = rmw_take_loaned_message_with_info(
-    nullptr, &loaned_message, &taken, &message_info, null_allocation);
-  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-  EXPECT_EQ(nullptr, loaned_message);
-  EXPECT_FALSE(taken);
-
-  ret = rmw_take_loaned_message_with_info(
-    sub, nullptr, &taken, &message_info, null_allocation);
-  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-  EXPECT_EQ(nullptr, loaned_message);
-  EXPECT_FALSE(taken);
-
-  ret = rmw_take_loaned_message_with_info(
-    sub, &loaned_message, nullptr, &message_info, null_allocation);
-  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-  EXPECT_EQ(nullptr, loaned_message);
-  EXPECT_FALSE(taken);
-
-  ret = rmw_take_loaned_message_with_info(
-    sub, &loaned_message, &taken, nullptr, null_allocation);
-  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-  EXPECT_EQ(nullptr, loaned_message);
-  EXPECT_FALSE(taken);
-
-  ret = rmw_take_loaned_message_with_info(
-    sub, &loaned_message, &taken, &message_info, null_allocation);
-  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  EXPECT_EQ(nullptr, loaned_message);
-  EXPECT_FALSE(taken);
-
-  const char * implementation_identifier = sub->implementation_identifier;
-  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
-  ret = rmw_take_loaned_message_with_info(
-    sub, &loaned_message, &taken, &message_info, null_allocation);
-  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-  sub->implementation_identifier = implementation_identifier;
+  // TODO(lobotuerk): add tests for rmw_take_loaned_message_with_info()
+  // when we have an implementation.
+  FAIL() << "Not implemented";
 }
 
 TEST_F(
   CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION),
   rmw_return_loaned_message_from_subscription) {
-  test_msgs__msg__BasicTypes msg{};
-  rmw_ret_t ret = rmw_return_loaned_message_from_subscription(nullptr, &msg);
-  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-
-  ret = rmw_return_loaned_message_from_subscription(sub, nullptr);
-  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-
-  // Returning a sample that was not loaned
-  ret = rmw_return_loaned_message_from_subscription(sub, &msg);
-  EXPECT_EQ(RMW_RET_ERROR, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-
-  const char * implementation_identifier = sub->implementation_identifier;
-  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
-  ret = rmw_return_loaned_message_from_subscription(sub, &msg);
-  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
-  rmw_reset_error();
-  sub->implementation_identifier = implementation_identifier;
+  // TODO(lobotuerk): add tests for rmw_return_loaned_message_from_subscription()
+  // when we have an implementation.
+  FAIL() << "Not implemented";
 }
 
 bool operator==(const test_msgs__msg__BasicTypes & m1, const test_msgs__msg__BasicTypes & m2)

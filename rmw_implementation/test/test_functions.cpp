@@ -17,6 +17,7 @@
 #include <memory>
 
 #include "rcutils/env.h"
+#include "rcutils/get_env.h"
 #include "rcutils/testing/fault_injection.h"
 
 #include "rmw/error_handling.h"

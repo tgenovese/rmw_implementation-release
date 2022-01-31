@@ -2,85 +2,24 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.7.1 (2022-01-14)
-------------------
-* Fix relative path include syntax for cpplint (`#203 <https://github.com/ros2/rmw_implementation/issues/203>`_)
-* Support and prefer exported targets from rmw implementations (`#201 <https://github.com/ros2/rmw_implementation/issues/201>`_)
-* Contributors: Jacob Perron, Shane Loretz
-
-2.7.0 (2021-11-19)
-------------------
-* Add client/service QoS getters. (`#196 <https://github.com/ros2/rmw_implementation/issues/196>`_)
-* Update maintainers to Audrow Nash and Michael Carroll. (`#199 <https://github.com/ros2/rmw_implementation/issues/199>`_)
-* Contributors: Audrow Nash, mauropasse
-
-2.6.1 (2021-11-18)
-------------------
-* Fix renamed `rcpputils` header (`#198 <https://github.com/ros2/rmw_implementation/issues/198>`_)
-* Fix rmw_implementation generated documentation (`#197 <https://github.com/ros2/rmw_implementation/issues/197>`_)
-* Contributors: Abrar Rahman Protyasha, Michel Hidalgo
-
-2.6.0 (2021-08-09)
-------------------
-* Add rmw_publisher_wait_for_all_acked. (`#188 <https://github.com/ros2/rmw_implementation/issues/188>`_)
-* Contributors: Barry Xu
-
-2.5.0 (2021-05-05)
-------------------
-* Attempt to load any available RMW implementation. (`#189 <https://github.com/ros2/rmw_implementation/issues/189>`_)
-* Update includes after rcutils/get_env.h deprecation (`#190 <https://github.com/ros2/rmw_implementation/issues/190>`_)
-* Contributors: Chris Lalancette, Christophe Bedard
-
-2.4.1 (2021-04-16)
+1.0.3 (2022-01-31)
 ------------------
 
-2.4.0 (2021-04-06)
+1.0.2 (2021-04-14)
 ------------------
-* Unique network flows (`#170 <https://github.com/ros2/rmw_implementation/issues/170>`_)
-* updating quality declaration links (re: `ros2/docs.ros2.org#52 <https://github.com/ros2/docs.ros2.org/issues/52>`_) (`#185 <https://github.com/ros2/rmw_implementation/issues/185>`_)
-* Contributors: Ananya Muddukrishna, shonigmann
-
-2.3.0 (2021-03-25)
-------------------
-* Remove rmw_connext_cpp. (`#183 <https://github.com/ros2/rmw_implementation/issues/183>`_)
-* Add support for rmw_connextdds (`#182 <https://github.com/ros2/rmw_implementation/issues/182>`_)
-* Contributors: Andrea Sorbini, Chris Lalancette
-
-2.2.0 (2021-03-08)
-------------------
-* Add function for checking QoS profile compatibility (`#180 <https://github.com/ros2/rmw_implementation/issues/180>`_)
-* Shorten some excessively long lines of CMake (`#179 <https://github.com/ros2/rmw_implementation/issues/179>`_)
-* Add rmw_fastrtps_dynamic_cpp to the explicit group deps (`#177 <https://github.com/ros2/rmw_implementation/issues/177>`_)
-* Contributors: Jacob Perron, Scott K Logan
-
-2.1.2 (2021-01-29)
-------------------
-* Accept any RMW implementation, not just the default (`#172 <https://github.com/ros2/rmw_implementation/issues/172>`_)
-* Contributors: Scott K Logan
-
-2.1.1 (2021-01-25)
-------------------
-* Defer path resolution of rmw implementation libraries to dynamic linker. (`#169 <https://github.com/ros2/rmw_implementation/issues/169>`_)
-* Contributors: Michel Hidalgo
-
-2.1.0 (2020-12-10)
-------------------
-* Update QD to QL 1 (`#166 <https://github.com/ros2/rmw_implementation/issues/166>`_)
-* Fix up C functions to never throw. (`#149 <https://github.com/ros2/rmw_implementation/issues/149>`_)
-* Restored Dirk as author (`#155 <https://github.com/ros2/rmw_implementation/issues/155>`_)
-* Update maintainers (`#154 <https://github.com/ros2/rmw_implementation/issues/154>`_)
+* Update quality declaration links (re: `ros2/docs.ros2.org#52 <https://github.com/ros2/docs.ros2.org/issues/52>`_) (`#184 <https://github.com/ros2/rmw_implementation/issues/184>`_)
+* Update QD to QL 1 (`#167 <https://github.com/ros2/rmw_implementation/issues/167>`_)
 * Updated performance QD section (`#153 <https://github.com/ros2/rmw_implementation/issues/153>`_)
-* Update Quality Declaration to QL2. (`#151 <https://github.com/ros2/rmw_implementation/issues/151>`_)
+* Move the QD into the rmw_implementation subdirectory. (`#111 <https://github.com/ros2/rmw_implementation/issues/111>`_)
 * Add nominal test for symbol prefetch() and unload. (`#145 <https://github.com/ros2/rmw_implementation/issues/145>`_)
 * Added benchmark test to rmw_implementation (`#127 <https://github.com/ros2/rmw_implementation/issues/127>`_)
 * Test load and lookup functionality. (`#135 <https://github.com/ros2/rmw_implementation/issues/135>`_)
-* Contributors: Alejandro Hernández Cordero, Michel Hidalgo, Stephen Brawner
+* Contributors: Alejandro Hernández Cordero, Chris Lalancette, Michel Hidalgo, Scott K Logan, Simon Honigmann, Stephen Brawner
 
-2.0.0 (2020-07-08)
+1.0.1 (2020-10-21)
 ------------------
-* Remove domain_id and localhost_only from node API (`#114 <https://github.com/ros2/rmw_implementation/issues/114>`_)
-* Move the quality declaration into the rmw_implementation subdirectory. (`#111 <https://github.com/ros2/rmw_implementation/issues/111>`_)
-* Contributors: Chris Lalancette, Ivan Santiago Paunovic
+* Foxy updated maintainers (`#158 <https://github.com/ros2/rmw_implementation/issues/158>`_)
+* Contributors: Alejandro Hernández Cordero
 
 1.0.0 (2020-05-12)
 ------------------

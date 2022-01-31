@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "functions.hpp"
+#include "./functions.hpp"
 
 #include <cstddef>
-#include <map>
-#include <memory>
 #include <stdexcept>
-#include <string>
 
-#include "ament_index_cpp/get_resources.hpp"
+#include <memory>
+#include <string>
 
 #include "rcutils/allocator.h"
 #include "rcutils/format_string.h"
+#include "rcutils/get_env.h"
 #include "rcutils/types/string_array.h"
 
-#include "rcpputils/env.hpp"
+#include "rcpputils/find_library.hpp"
+#include "rcpputils/get_env.hpp"
 #include "rcpputils/shared_library.hpp"
 
 #include "rmw/error_handling.h"
 #include "rmw/event.h"
 #include "rmw/names_and_types.h"
-#include "rmw/get_network_flow_endpoints.h"
 #include "rmw/get_node_info_and_types.h"
 #include "rmw/get_service_names_and_types.h"
 #include "rmw/get_topic_endpoint_info.h"
@@ -44,43 +43,9 @@
 
 static std::shared_ptr<rcpputils::SharedLibrary> g_rmw_lib = nullptr;
 
-static std::shared_ptr<rcpputils::SharedLibrary>
-attempt_to_load_one_rmw(const std::string & library)
-{
-  std::string library_name;
-  std::shared_ptr<rcpputils::SharedLibrary> ret = nullptr;
-
-  try {
-    library_name = rcpputils::get_platform_library_name(library);
-  } catch (const std::exception & e) {
-    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
-      "failed to compute shared library name due to %s", e.what());
-    return ret;
-  }
-
-  try {
-    ret = std::make_shared<rcpputils::SharedLibrary>(library_name);
-  } catch (const std::exception & e) {
-    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
-      "failed to load shared library '%s' due to %s",
-      library_name.c_str(), e.what());
-    ret = nullptr;
-  }
-
-  return ret;
-}
-
 std::shared_ptr<rcpputils::SharedLibrary>
 load_library()
 {
-  // The logic to pick the RMW library to load goes as follows:
-  //
-  // 1. If the user specified the library to use via the RMW_IMPLEMENTATION
-  //    environment variable, try to load only that library.
-  // 2. Otherwise, try to load the default RMW implementation.
-  // 3. If that fails, try loading all other implementations available in turn
-  //    until one succeeds or we run out of options.
-
   std::string env_var;
   try {
     env_var = rcpputils::get_env_var("RMW_IMPLEMENTATION");
@@ -91,39 +56,34 @@ load_library()
     return nullptr;
   }
 
-  // User specified an RMW, attempt to load that one and only that one
-  if (!env_var.empty()) {
-    return attempt_to_load_one_rmw(env_var);
+  if (env_var.empty()) {
+    env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
   }
 
-  // User didn't specify, so next try to load the default RMW
-  std::shared_ptr<rcpputils::SharedLibrary> ret;
-
-  ret = attempt_to_load_one_rmw(STRINGIFY(DEFAULT_RMW_IMPLEMENTATION));
-  if (ret != nullptr) {
-    return ret;
+  std::string library_path;
+  try {
+    library_path = rcpputils::find_library_path(env_var);
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to find shared library due to %s", e.what());
+    return nullptr;
   }
 
-  // OK, we failed to load the default RMW.  Fetch all of the ones we can
-  // find and attempt to load them one-by-one.
-  rmw_reset_error();
-  const std::map<std::string, std::string> packages_with_prefixes = ament_index_cpp::get_resources(
-    "rmw_typesupport");
-  for (const auto & package_prefix_pair : packages_with_prefixes) {
-    if (package_prefix_pair.first != "rmw_implementation") {
-      ret = attempt_to_load_one_rmw(package_prefix_pair.first);
-      if (ret != nullptr) {
-        return ret;
-      }
-      rmw_reset_error();
-    }
+  if (library_path.empty()) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to find shared library '%s'",
+      env_var.c_str());
+    return nullptr;
   }
 
-  // If we made it here, we couldn't find an rmw to load.
-
-  RMW_SET_ERROR_MSG("failed to load any RMW implementations");
-
-  return nullptr;
+  try {
+    return std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to load shared library '%s' due to %s",
+      library_path.c_str(), e.what());
+    return nullptr;
+  }
 }
 
 std::shared_ptr<rcpputils::SharedLibrary>
@@ -136,7 +96,7 @@ get_library()
 }
 
 void *
-lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const std::string & symbol_name)
+lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const char * symbol_name)
 {
   if (!lib) {
     if (!rmw_error_is_set()) {
@@ -150,28 +110,22 @@ lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const std::string &
       std::string library_path = lib->get_library_path();
       RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
         "failed to resolve symbol '%s' in shared library '%s'",
-        symbol_name.c_str(), library_path.c_str());
-    } catch (const std::exception & e) {
+        symbol_name, library_path.c_str());
+    } catch (const std::runtime_error &) {
       RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
-        "failed to resolve symbol '%s' in shared library due to %s",
-        symbol_name.c_str(), e.what());
+        "failed to resolve symbol '%s' in shared library",
+        symbol_name);
     }
     return nullptr;
   }
+
   return lib->get_symbol(symbol_name);
 }
 
 void *
 get_symbol(const char * symbol_name)
 {
-  try {
-    return lookup_symbol(get_library(), symbol_name);
-  } catch (const std::exception & e) {
-    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
-      "failed to get symbol '%s' due to %s",
-      symbol_name, e.what());
-    return nullptr;
-  }
+  return lookup_symbol(get_library(), symbol_name);
 }
 
 #ifdef __cplusplus
@@ -262,8 +216,8 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_create_node,
   rmw_node_t *, nullptr,
-  3, ARG_TYPES(
-    rmw_context_t *, const char *, const char *))
+  5, ARG_TYPES(
+    rmw_context_t *, const char *, const char *, size_t, bool))
 
 RMW_INTERFACE_FN(
   rmw_destroy_node,
@@ -358,11 +312,6 @@ RMW_INTERFACE_FN(
   rmw_publisher_assert_liveliness,
   rmw_ret_t, RMW_RET_ERROR,
   1, ARG_TYPES(const rmw_publisher_t *))
-
-RMW_INTERFACE_FN(
-  rmw_publisher_wait_for_all_acked,
-  rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const rmw_publisher_t *, rmw_time_t))
 
 RMW_INTERFACE_FN(
   rmw_serialize,
@@ -490,16 +439,6 @@ RMW_INTERFACE_FN(
   4, ARG_TYPES(const rmw_client_t *, rmw_service_info_t *, void *, bool *))
 
 RMW_INTERFACE_FN(
-  rmw_client_request_publisher_get_actual_qos,
-  rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const rmw_client_t *, rmw_qos_profile_t *))
-
-RMW_INTERFACE_FN(
-  rmw_client_response_subscription_get_actual_qos,
-  rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const rmw_client_t *, rmw_qos_profile_t *))
-
-RMW_INTERFACE_FN(
   rmw_create_service,
   rmw_service_t *, nullptr,
   4, ARG_TYPES(
@@ -520,16 +459,6 @@ RMW_INTERFACE_FN(
   rmw_send_response,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *))
-
-RMW_INTERFACE_FN(
-  rmw_service_response_publisher_get_actual_qos,
-  rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const rmw_service_t *, rmw_qos_profile_t *))
-
-RMW_INTERFACE_FN(
-  rmw_service_request_subscription_get_actual_qos,
-  rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const rmw_service_t *, rmw_qos_profile_t *))
 
 RMW_INTERFACE_FN(
   rmw_take_event,
@@ -672,32 +601,6 @@ RMW_INTERFACE_FN(
     bool,
     rmw_topic_endpoint_info_array_t *))
 
-RMW_INTERFACE_FN(
-  rmw_qos_profile_check_compatible,
-  rmw_ret_t, RMW_RET_ERROR,
-  5, ARG_TYPES(
-    const rmw_qos_profile_t,
-    const rmw_qos_profile_t,
-    rmw_qos_compatibility_type_t *,
-    char *,
-    size_t))
-
-RMW_INTERFACE_FN(
-  rmw_publisher_get_network_flow_endpoints,
-  rmw_ret_t, RMW_RET_ERROR,
-  3, ARG_TYPES(
-    const rmw_publisher_t *,
-    rcutils_allocator_t *,
-    rmw_network_flow_endpoint_array_t *))
-
-RMW_INTERFACE_FN(
-  rmw_subscription_get_network_flow_endpoints,
-  rmw_ret_t, RMW_RET_ERROR,
-  3, ARG_TYPES(
-    const rmw_subscription_t *,
-    rcutils_allocator_t *,
-    rmw_network_flow_endpoint_array_t *))
-
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -727,7 +630,6 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_publisher_event_init)
   GET_SYMBOL(rmw_publish_serialized_message)
   GET_SYMBOL(rmw_publisher_assert_liveliness)
-  GET_SYMBOL(rmw_publisher_wait_for_all_acked)
   GET_SYMBOL(rmw_get_serialized_message_size)
   GET_SYMBOL(rmw_serialize)
   GET_SYMBOL(rmw_deserialize)
@@ -772,17 +674,10 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_count_subscribers)
   GET_SYMBOL(rmw_get_gid_for_publisher)
   GET_SYMBOL(rmw_compare_gids_equal)
-  GET_SYMBOL(rmw_service_response_publisher_get_actual_qos);
-  GET_SYMBOL(rmw_service_request_subscription_get_actual_qos);
   GET_SYMBOL(rmw_service_server_is_available)
   GET_SYMBOL(rmw_set_log_severity)
   GET_SYMBOL(rmw_get_publishers_info_by_topic)
   GET_SYMBOL(rmw_get_subscriptions_info_by_topic)
-  GET_SYMBOL(rmw_qos_profile_check_compatible)
-  GET_SYMBOL(rmw_publisher_get_network_flow_endpoints)
-  GET_SYMBOL(rmw_subscription_get_network_flow_endpoints)
-  GET_SYMBOL(rmw_client_request_publisher_get_actual_qos);
-  GET_SYMBOL(rmw_client_response_subscription_get_actual_qos);
 }
 
 void * symbol_rmw_init = nullptr;
@@ -834,7 +729,6 @@ unload_library()
   symbol_rmw_publish_serialized_message = nullptr;
   symbol_rmw_get_serialized_message_size = nullptr;
   symbol_rmw_publisher_assert_liveliness = nullptr;
-  symbol_rmw_publisher_wait_for_all_acked = nullptr;
   symbol_rmw_serialize = nullptr;
   symbol_rmw_deserialize = nullptr;
   symbol_rmw_init_subscription_allocation = nullptr;
@@ -854,14 +748,10 @@ unload_library()
   symbol_rmw_return_loaned_message_from_subscription = nullptr;
   symbol_rmw_create_client = nullptr;
   symbol_rmw_destroy_client = nullptr;
-  symbol_rmw_client_request_publisher_get_actual_qos = nullptr;
-  symbol_rmw_client_response_subscription_get_actual_qos = nullptr;
   symbol_rmw_send_request = nullptr;
   symbol_rmw_take_response = nullptr;
   symbol_rmw_create_service = nullptr;
   symbol_rmw_destroy_service = nullptr;
-  symbol_rmw_service_response_publisher_get_actual_qos = nullptr;
-  symbol_rmw_service_request_subscription_get_actual_qos = nullptr;
   symbol_rmw_take_request = nullptr;
   symbol_rmw_send_response = nullptr;
   symbol_rmw_take_event = nullptr;
@@ -887,9 +777,6 @@ unload_library()
   symbol_rmw_set_log_severity = nullptr;
   symbol_rmw_get_publishers_info_by_topic = nullptr;
   symbol_rmw_get_subscriptions_info_by_topic = nullptr;
-  symbol_rmw_qos_profile_check_compatible = nullptr;
-  symbol_rmw_publisher_get_network_flow_endpoints = nullptr;
-  symbol_rmw_subscription_get_network_flow_endpoints = nullptr;
   symbol_rmw_init = nullptr;
   g_rmw_lib.reset();
 }
