@@ -1,0 +1,32 @@
+From 3970da482717bec2d17a29c1af1110e6c20217c1 Mon Sep 17 00:00:00 2001
+From: Scott K Logan <logans@cottsay.net>
+Date: Tue, 9 Mar 2021 15:57:20 -0800
+Subject: [PATCH 1/2] Resolve rmw_implementation_packages dependencies
+
+Require any RMW implementation at runtime, and suggest the default RMW,
+`rmw_cyclonedds_cpp` if weak dependencies are supported.
+
+Signed-off-by: Scott K Logan <logans@cottsay.net>
+---
+ rpm/template.spec.em | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/rpm/template.spec.em b/rpm/template.spec.em
+index 836b2af..b71a036 100644
+--- a/rpm/template.spec.em
++++ b/rpm/template.spec.em
+@@ -15,6 +15,11 @@ License:        @(License)
+ Source0:        %{name}-%{version}.tar.gz
+ @[if NoArch]@\nBuildArch:      noarch@\n@[end if]@
+ 
++Requires:       ros-@(Rosdistro)-rmw-implementation-packages(member)
++%if 0%{?with_weak_deps}
++Recommends:     ros-@(Rosdistro)-rmw-cyclonedds-cpp
++%endif
++
+ @[for p in Depends]Requires:       @p@\n@[end for]@
+ @[for p in BuildDepends]BuildRequires:  @p@\n@[end for]@
+ @[for p in Conflicts]Conflicts:      @p@\n@[end for]@
+-- 
+2.35.1
+
