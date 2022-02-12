@@ -1,0 +1,26 @@
+From b4222327a4a347c27a42f93015da0a1fb89451f9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?=
+ <nuclearsandwich@users.noreply.github.com>
+Date: Sat, 12 Feb 2022 10:57:14 -0500
+Subject: [PATCH] Add runtime dependency on an rmw_implementation.
+
+---
+ debian/control.em | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/debian/control.em b/debian/control.em
+index 6d7b65c..a37e194 100644
+--- a/debian/control.em
++++ b/debian/control.em
+@@ -8,7 +8,7 @@ Standards-Version: 3.9.2
+ 
+ Package: @(Package)
+ Architecture: any
+-Depends: ${shlibs:Depends}, ${misc:Depends}, @(', '.join(Depends))
++Depends: ${shlibs:Depends}, ${misc:Depends}, @(', '.join(Depends)), ros-@(Rosdistro)-rmw-cyclonedds-cpp | ros-@(Rosdistro)-rmw-connextdds | ros-@(Rosdistro)-rmw-fastrtps-cpp
+ @[if Conflicts]Conflicts: @(', '.join(Conflicts))@\n@[end if]@
+ @[if Replaces]Replaces: @(', '.join(Replaces))@\n@[end if]@
+ Description: @(Description)
+-- 
+2.35.1
+
