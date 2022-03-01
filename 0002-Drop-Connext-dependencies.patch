@@ -1,4 +1,4 @@
-From 78bbf5d2cc220ab369f3f0b047334778d2c36b30 Mon Sep 17 00:00:00 2001
+From 18f7f3b7300be95ac2c3ac518c9bf8269c031dc7 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Tue, 9 Mar 2021 16:07:42 -0800
 Subject: [PATCH 2/2] Drop Connext dependencies
@@ -36,5 +36,5 @@ index b71a036..ef97ff9 100644
  %bcond_without weak_deps
  
 -- 
-2.35.1
+2.25.1
 
