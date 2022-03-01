@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.0 (2022-03-01)
+------------------
+* Add EventsExecutor (`#161 <https://github.com/ros2/rmw_implementation/issues/161>`_)
+* Contributors: iRobot ROS
+
 2.7.1 (2022-01-14)
 ------------------
 * Fix relative path include syntax for cpplint (`#203 <https://github.com/ros2/rmw_implementation/issues/203>`_)
