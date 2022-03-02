@@ -1,0 +1,26 @@
+From 0cd0693e4008580fb0d512761e3c93907b64001b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?=
+ <nuclearsandwich@users.noreply.github.com>
+Date: Wed, 2 Mar 2022 06:42:46 -0800
+Subject: [PATCH 3/3] Set recommended rmw implementation to current default.
+
+---
+ rpm/template.spec.em | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rpm/template.spec.em b/rpm/template.spec.em
+index ef97ff9..d7e29aa 100644
+--- a/rpm/template.spec.em
++++ b/rpm/template.spec.em
+@@ -21,7 +21,7 @@ Source0:        %{name}-%{version}.tar.gz
+ 
+ Requires:       ros-@(Rosdistro)-rmw-implementation-packages(member)
+ %if 0%{?with_weak_deps}
+-Recommends:     ros-@(Rosdistro)-rmw-cyclonedds-cpp
++Recommends:     ros-@(Rosdistro)-rmw-fastrtps-cpp
+ %endif
+ 
+ @[for p in Depends]Requires:       @p@\n@[end for]@
+-- 
+2.35.1
+
