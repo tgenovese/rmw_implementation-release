@@ -1,4 +1,4 @@
-From 764459ce264925ddb7663aa0668c9aed8cb4cefc Mon Sep 17 00:00:00 2001
+From d4e90aa2b303a1fc1247816bb89aedf885b9beb2 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Tue, 9 Mar 2021 16:07:42 -0800
 Subject: [PATCH 2/3] Drop Connext dependencies
@@ -12,7 +12,7 @@ Signed-off-by: Scott K Logan <logans@cottsay.net>
  2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/package.xml b/package.xml
-index 604b910..71d44bb 100644
+index a9df58f..1e07b1d 100644
 --- a/package.xml
 +++ b/package.xml
 @@ -24,7 +24,6 @@
