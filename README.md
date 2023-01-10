@@ -1,3 +1,29 @@
+## rmw_implementation (humble) - 2.8.2-1
+
+The packages in the `rmw_implementation` repository were released into the `humble` distro by running `/usr/local/bin/bloom-release -r humble -y rmw_implementation` on `Tue, 10 Jan 2023 14:03:28 -0000`
+
+The `rmw_implementation` package was released.
+
+These packages were explicitly ignored:
+- `test_rmw_implementation`
+
+Version of package(s) in repository `rmw_implementation`:
+
+- upstream repository: https://github.com/ros2/rmw_implementation.git
+- release repository: https://github.com/ros2-gbp/rmw_implementation-release.git
+- rosdistro version: `2.8.1-2`
+- old version: `2.8.1-2`
+- new version: `2.8.2-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `0.5.2`
+- rosdep version: `0.22.1`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## rmw_implementation (rolling) - 2.10.0-1
 
 The packages in the `rmw_implementation` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --track rolling --rosdistro rolling rmw_implementation` on `Wed, 02 Nov 2022 16:35:34 -0000`
