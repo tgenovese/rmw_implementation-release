@@ -1,4 +1,4 @@
-From 52da5a525aefad4b7d9e852c454b6244a41798ae Mon Sep 17 00:00:00 2001
+From ee06284907605b1cb1f6664a216b5af023fa2bb6 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?=
  <nuclearsandwich@users.noreply.github.com>
 Date: Wed, 2 Mar 2022 06:42:46 -0800
@@ -9,7 +9,7 @@ Subject: [PATCH 3/3] Set recommended rmw implementation to current default.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/rpm/template.spec.em b/rpm/template.spec.em
-index ef97ff9..d7e29aa 100644
+index 0646a32..ae85612 100644
 --- a/rpm/template.spec.em
 +++ b/rpm/template.spec.em
 @@ -21,7 +21,7 @@ Source0:        %{name}-%{version}.tar.gz
@@ -22,5 +22,5 @@ index ef97ff9..d7e29aa 100644
  
  @[for p in Depends]Requires:       @p@\n@[end for]@
 -- 
-2.25.1
+2.34.1
 
