@@ -2,16 +2,10 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.10.0 (2022-11-02)
--------------------
-* Add rmw_get_gid_for_client & tests (`#206 <https://github.com/ros2/rmw_implementation/issues/206>`_)
-* Contributors: Brian
-
-2.9.1 (2022-09-13)
+2.8.2 (2023-01-10)
 ------------------
-
-2.9.0 (2022-04-29)
-------------------
+* Build-time RMW selection does not need ament_index_cpp (`#210 <https://github.com/ros2/rmw_implementation/issues/210>`_) (`#211 <https://github.com/ros2/rmw_implementation/issues/211>`_)
+* Contributors: mergify[bot]
 
 2.8.1 (2022-03-28)
 ------------------
