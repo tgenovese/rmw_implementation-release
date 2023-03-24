@@ -1,0 +1,32 @@
+From 829de54bfe3ad2ca920d9be6021f96d0e3369ebf Mon Sep 17 00:00:00 2001
+From: Scott K Logan <logans@cottsay.net>
+Date: Tue, 9 Mar 2021 15:57:20 -0800
+Subject: [PATCH 2/2] Resolve rmw_implementation_packages dependencies
+
+Require any RMW implementation at runtime, and suggest the default RMW,
+`rmw_fastrtps_cpp` if weak dependencies are supported.
+
+Signed-off-by: Scott K Logan <logans@cottsay.net>
+---
+ rpm/template.spec.em | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/rpm/template.spec.em b/rpm/template.spec.em
+index 7755dbc..ae85612 100644
+--- a/rpm/template.spec.em
++++ b/rpm/template.spec.em
+@@ -19,6 +19,11 @@ License:        @(License)
+ Source0:        %{name}-%{version}.tar.gz
+ @[if NoArch]@\nBuildArch:      noarch@\n@[end if]@
+ 
++Requires:       ros-@(Rosdistro)-rmw-implementation-packages(member)
++%if 0%{?with_weak_deps}
++Recommends:     ros-@(Rosdistro)-rmw-fastrtps-cpp
++%endif
++
+ @[for p in Depends]Requires:       @p@\n@[end for]@
+ @[for p in BuildDepends]BuildRequires:  @p@\n@[end for]@
+ @[for p in Conflicts]Conflicts:      @p@\n@[end for]@
+-- 
+2.39.2
+
