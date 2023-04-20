@@ -1,0 +1,12 @@
+Source: ros-iron-rmw-implementation
+Section: misc
+Priority: optional
+Maintainer: William Woodall <william@openrobotics.org>
+Build-Depends: debhelper (>= 9.0.0), ros-iron-ament-cmake, ros-iron-ament-cmake-gtest <!nocheck>, ros-iron-ament-index-cpp, ros-iron-ament-lint-auto <!nocheck>, ros-iron-ament-lint-common <!nocheck>, ros-iron-performance-test-fixture <!nocheck>, ros-iron-rcpputils, ros-iron-rcutils, ros-iron-rmw, ros-iron-rmw-connextdds, ros-iron-rmw-cyclonedds-cpp, ros-iron-rmw-fastrtps-cpp, ros-iron-rmw-fastrtps-dynamic-cpp, ros-iron-rmw-implementation-cmake, ros-iron-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-iron-rmw-implementation
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-iron-ament-index-cpp, ros-iron-rcpputils, ros-iron-rcutils, ros-iron-rmw-implementation-cmake, ros-iron-ros-workspace, ros-iron-rmw-fastrtps-cpp | ros-iron-rmw-cyclonedds-cpp | ros-iron-rmw-connextdds
+Description: Proxy implementation of the ROS 2 Middleware Interface.
