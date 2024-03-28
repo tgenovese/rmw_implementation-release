@@ -1,4 +1,4 @@
-From 24773ab17083a8de8aff9d8241565b87ebe62afc Mon Sep 17 00:00:00 2001
+From be98303d18d364553c5787ec9fcf40a8917ee2c3 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Tue, 9 Mar 2021 16:07:42 -0800
 Subject: [PATCH 1/2] Drop Connext dependencies
@@ -12,7 +12,7 @@ Signed-off-by: Scott K Logan <logans@cottsay.net>
  2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/package.xml b/package.xml
-index db29b4572736..efb4ff77fdeb 100644
+index db29b45..efb4ff7 100644
 --- a/package.xml
 +++ b/package.xml
 @@ -25,7 +25,6 @@
@@ -24,7 +24,7 @@ index db29b4572736..efb4ff77fdeb 100644
    <build_depend>rmw_fastrtps_cpp</build_depend>
    <build_depend>rmw_fastrtps_dynamic_cpp</build_depend>
 diff --git a/rpm/template.spec.em b/rpm/template.spec.em
-index bebb96b6a6a5..7755dbc127fa 100644
+index bebb96b..7755dbc 100644
 --- a/rpm/template.spec.em
 +++ b/rpm/template.spec.em
 @@ -1,3 +1,7 @@
@@ -36,5 +36,5 @@ index bebb96b6a6a5..7755dbc127fa 100644
  %bcond_without weak_deps
  
 -- 
-2.44.0
+2.44.0.396.g6e790dbe36-goog
 
