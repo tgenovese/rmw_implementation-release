@@ -1,4 +1,4 @@
-From 39e706a9673738a320910887633c308be2a87584 Mon Sep 17 00:00:00 2001
+From 63e3565d42112e2574a368e3a16267782382a5f9 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Tue, 9 Mar 2021 15:57:20 -0800
 Subject: [PATCH 2/2] Resolve rmw_implementation_packages dependencies
@@ -28,5 +28,5 @@ index 7755dbc..ae85612 100644
  @[for p in BuildDepends]BuildRequires:  @p@\n@[end for]@
  @[for p in Conflicts]Conflicts:      @p@\n@[end for]@
 -- 
-2.44.0.396.g6e790dbe36-goog
+2.44.0.769.g3c40516874-goog
 
