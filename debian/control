@@ -1,0 +1,12 @@
+Source: ros-humble-rmw-implementation
+Section: misc
+Priority: optional
+Maintainer: Audrow Nash <audrow@openrobotics.org>
+Build-Depends: debhelper (>= 9.0.0), ros-humble-ament-cmake, ros-humble-ament-cmake-gtest <!nocheck>, ros-humble-ament-index-cpp, ros-humble-ament-lint-auto <!nocheck>, ros-humble-ament-lint-common <!nocheck>, ros-humble-performance-test-fixture <!nocheck>, ros-humble-rcpputils, ros-humble-rcutils, ros-humble-rmw, ros-humble-rmw-connextdds, ros-humble-rmw-cyclonedds-cpp, ros-humble-rmw-fastrtps-cpp, ros-humble-rmw-fastrtps-dynamic-cpp, ros-humble-rmw-implementation-cmake, ros-humble-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-humble-rmw-implementation
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-humble-ament-index-cpp, ros-humble-rcpputils, ros-humble-rcutils, ros-humble-rmw-implementation-cmake, ros-humble-ros-workspace, ros-humble-rmw-fastrtps-cpp | ros-humble-rmw-cyclonedds-cpp | ros-humble-rmw-connextdds
+Description: Proxy implementation of the ROS 2 Middleware Interface.
