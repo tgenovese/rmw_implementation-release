@@ -24,7 +24,14 @@
 #include "./config.hpp"
 #include "./testing_macros.hpp"
 
-class TestDurationInfinite : public ::testing::Test
+#ifdef RMW_IMPLEMENTATION
+# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
+# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
+#else
+# define CLASSNAME(NAME, SUFFIX) NAME
+#endif
+
+class CLASSNAME (TestDurationInfinite, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -60,7 +67,7 @@ protected:
   rmw_node_t * node;
 };
 
-TEST_F(TestDurationInfinite, create_publisher)
+TEST_F(CLASSNAME(TestDurationInfinite, RMW_IMPLEMENTATION), create_publisher)
 {
   rmw_ret_t ret = RMW_RET_ERROR;
   size_t match_count = 0;
