@@ -2,10 +2,54 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.8.3 (2024-05-15)
+3.0.0 (2024-06-17)
+------------------
+* Expect rmw_service_server_is_available to ret RMW_RET_INVALID_ARGUMENT (`#231 <https://github.com/ros2/rmw_implementation/issues/231>`_)
+* Expect rmw_destroy_wait_set to ret RMW_RET_INVALID_ARGUMENT (`#234 <https://github.com/ros2/rmw_implementation/issues/234>`_)
+* Add test creating two content filter topics with the same topic name (`#230 <https://github.com/ros2/rmw_implementation/issues/230>`_) (`#233 <https://github.com/ros2/rmw_implementation/issues/233>`_)
+* Contributors: Alejandro Hernández Cordero, Christophe Bedard
+
+2.16.0 (2024-04-26)
+-------------------
+
+2.15.1 (2024-03-28)
+-------------------
+* Compile the test_rmw_implementation tests fewer times. (`#224 <https://github.com/ros2/rmw_implementation/issues/224>`_)
+* Contributors: Chris Lalancette
+
+2.15.0 (2023-12-26)
+-------------------
+* Switch to using target_link_libraries everywhere. (`#222 <https://github.com/ros2/rmw_implementation/issues/222>`_)
+* Contributors: Chris Lalancette
+
+2.14.0 (2023-10-04)
+-------------------
+* Add rmw_count_clients,services & test (`#208 <https://github.com/ros2/rmw_implementation/issues/208>`_)
+* Contributors: Minju, Lee
+
+2.13.0 (2023-04-27)
+-------------------
+
+2.12.0 (2023-04-11)
+-------------------
+* Add tests for rmw matched event (`#216 <https://github.com/ros2/rmw_implementation/issues/216>`_)
+* Contributors: Barry Xu
+
+2.11.0 (2023-02-13)
+-------------------
+* Update rmw_implementation to C++17. (`#214 <https://github.com/ros2/rmw_implementation/issues/214>`_)
+* [rolling] Update maintainers - 2022-11-07 (`#212 <https://github.com/ros2/rmw_implementation/issues/212>`_)
+* Contributors: Audrow Nash, Chris Lalancette
+
+2.10.0 (2022-11-02)
+-------------------
+* Add rmw_get_gid_for_client & tests (`#206 <https://github.com/ros2/rmw_implementation/issues/206>`_)
+* Contributors: Brian
+
+2.9.1 (2022-09-13)
 ------------------
 
-2.8.2 (2023-01-10)
+2.9.0 (2022-04-29)
 ------------------
 
 2.8.1 (2022-03-28)
