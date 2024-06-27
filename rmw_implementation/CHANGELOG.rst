@@ -2,15 +2,13 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.0.0 (2024-06-17)
-------------------
-* Add mechanism to disable workaround for dependency groups (`#229 <https://github.com/ros2/rmw_implementation/issues/229>`_)
-* Contributors: Scott K Logan
-
-2.16.0 (2024-04-26)
+2.15.3 (2024-06-27)
 -------------------
-* Update quality declaration document (`#225 <https://github.com/ros2/rmw_implementation/issues/225>`_)
-* Contributors: Christophe Bedard
+
+2.15.2 (2024-04-24)
+-------------------
+* Update quality declaration document (`#225 <https://github.com/ros2/rmw_implementation/issues/225>`_) (`#226 <https://github.com/ros2/rmw_implementation/issues/226>`_)
+* Contributors: mergify[bot]
 
 2.15.1 (2024-03-28)
 -------------------
