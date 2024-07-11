@@ -1,4 +1,4 @@
-From e04f0c432dc2ab8780919afaa5e38709b0ce18ff Mon Sep 17 00:00:00 2001
+From 67b1aca7e0529eebdfd5e8db5ed31deaec7135b3 Mon Sep 17 00:00:00 2001
 From: Scott K Logan <logans@cottsay.net>
 Date: Tue, 9 Mar 2021 16:07:42 -0800
 Subject: [PATCH 1/2] Drop Connext dependencies
