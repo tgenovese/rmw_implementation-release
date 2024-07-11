@@ -28,7 +28,14 @@
 #include "./config.hpp"
 #include "./testing_macros.hpp"
 
-class TestClient : public ::testing::Test
+#ifdef RMW_IMPLEMENTATION
+# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
+# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
+#else
+# define CLASSNAME(NAME, SUFFIX) NAME
+#endif
+
+class CLASSNAME (TestClient, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -65,7 +72,7 @@ protected:
   rmw_node_t * node{nullptr};
 };
 
-TEST_F(TestClient, create_and_destroy) {
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_and_destroy) {
   constexpr char service_name[] = "/test";
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
@@ -76,7 +83,7 @@ TEST_F(TestClient, create_and_destroy) {
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(TestClient, create_and_destroy_native) {
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_and_destroy_native) {
   constexpr char service_name[] = "/test";
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
@@ -89,7 +96,7 @@ TEST_F(TestClient, create_and_destroy_native) {
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(TestClient, create_with_bad_arguments) {
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_with_bad_arguments) {
   constexpr char service_name[] = "/test";
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
@@ -152,7 +159,7 @@ TEST_F(TestClient, create_with_bad_arguments) {
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(TestClient, create_with_internal_errors) {
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_with_internal_errors) {
   constexpr char service_name[] = "/test";
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
@@ -172,7 +179,7 @@ TEST_F(TestClient, create_with_internal_errors) {
   });
 }
 
-TEST_F(TestClient, destroy_with_internal_errors) {
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), destroy_with_internal_errors) {
   constexpr char service_name[] = "/test";
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
@@ -190,12 +197,15 @@ TEST_F(TestClient, destroy_with_internal_errors) {
   });
 }
 
-class TestClientUse : public TestClient
+class CLASSNAME (TestClientUse, RMW_IMPLEMENTATION)
+  : public CLASSNAME(TestClient, RMW_IMPLEMENTATION)
 {
 protected:
+  using Base = CLASSNAME(TestClient, RMW_IMPLEMENTATION);
+
   void SetUp() override
   {
-    TestClient::SetUp();
+    Base::SetUp();
     client = rmw_create_client(node, ts, service_name, &qos_profile);
     ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
   }
@@ -204,7 +214,7 @@ protected:
   {
     rmw_ret_t ret = rmw_destroy_client(node, client);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-    TestClient::TearDown();
+    Base::TearDown();
   }
 
   rmw_client_t * client{nullptr};
@@ -214,19 +224,19 @@ protected:
   rmw_qos_profile_t qos_profile{rmw_qos_profile_default};
 };
 
-TEST_F(TestClientUse, destroy_with_null_node) {
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), destroy_with_null_node) {
   rmw_ret_t ret = rmw_destroy_client(nullptr, client);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
 }
 
-TEST_F(TestClientUse, destroy_null_client) {
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), destroy_null_client) {
   rmw_ret_t ret = rmw_destroy_client(node, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
 }
 
-TEST_F(TestClientUse, destroy_with_node_of_another_impl) {
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), destroy_with_node_of_another_impl) {
   const char * implementation_identifier = node->implementation_identifier;
   node->implementation_identifier = "not-an-rmw-implementation-identifier";
   rmw_ret_t ret = rmw_destroy_client(node, client);
@@ -235,7 +245,7 @@ TEST_F(TestClientUse, destroy_with_node_of_another_impl) {
   rmw_reset_error();
 }
 
-TEST_F(TestClientUse, destroy_client_of_another_impl) {
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), destroy_client_of_another_impl) {
   const char * implementation_identifier = client->implementation_identifier;
   client->implementation_identifier = "not-an-rmw-implementation-identifier";
   rmw_ret_t ret = rmw_destroy_client(node, client);
@@ -244,7 +254,7 @@ TEST_F(TestClientUse, destroy_client_of_another_impl) {
   rmw_reset_error();
 }
 
-TEST_F(TestClient, send_request_with_bad_arguments) {
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), send_request_with_bad_arguments) {
   constexpr char service_name[] = "/test";
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
@@ -286,7 +296,7 @@ TEST_F(TestClient, send_request_with_bad_arguments) {
   rmw_reset_error();
 }
 
-TEST_F(TestClient, take_response_with_bad_arguments) {
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_arguments) {
   constexpr char service_name[] = "/test";
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
@@ -349,7 +359,7 @@ TEST_F(TestClient, take_response_with_bad_arguments) {
   rmw_reset_error();
 }
 
-TEST_F(TestClientUse, service_server_is_available_bad_args)
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available_bad_args)
 {
   bool is_available;
   rmw_ret_t ret = rmw_service_server_is_available(nullptr, client, &is_available);
@@ -372,7 +382,7 @@ TEST_F(TestClientUse, service_server_is_available_bad_args)
   rmw_reset_error();
 }
 
-TEST_F(TestClientUse, service_server_is_available_good_args)
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available_good_args)
 {
   bool is_available = false;
   rmw_ret_t ret = rmw_service_server_is_available(node, client, &is_available);
@@ -399,7 +409,7 @@ TEST_F(TestClientUse, service_server_is_available_good_args)
   ASSERT_TRUE(is_available);
 }
 
-TEST_F(TestClient, check_qos) {
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), check_qos) {
   constexpr char service_name[] = "/test";
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);

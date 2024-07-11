@@ -16,7 +16,14 @@
 
 #include "rmw/qos_profiles.h"
 
-TEST(TestQoSProfilesAreCompatible, compatible) {
+#ifdef RMW_IMPLEMENTATION
+# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
+# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
+#else
+# define CLASSNAME(NAME, SUFFIX) NAME
+#endif
+
+TEST(CLASSNAME(TestQoSProfilesAreCompatible, RMW_IMPLEMENTATION), compatible) {
   // A profile without system default or unknown values should be compatible with itself
   rmw_qos_profile_t qos = {
     RMW_QOS_POLICY_HISTORY_KEEP_LAST,
@@ -37,7 +44,7 @@ TEST(TestQoSProfilesAreCompatible, compatible) {
   EXPECT_EQ(compatible, RMW_QOS_COMPATIBILITY_OK);
 }
 
-TEST(TestQoSProfilesAreCompatible, invalid_input) {
+TEST(CLASSNAME(TestQoSProfilesAreCompatible, RMW_IMPLEMENTATION), invalid_input) {
   // Error on null 'compatible' parameter
   {
     rmw_ret_t ret = rmw_qos_profile_check_compatible(
