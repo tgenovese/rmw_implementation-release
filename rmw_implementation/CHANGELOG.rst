@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.12.1 (2024-07-11)
+-------------------
+* Update quality declaration document (`#227 <https://github.com/ros2/rmw_implementation/issues/227>`_)
+* Contributors: Christophe Bedard
+
 2.12.0 (2023-04-11)
 -------------------
 * Dynamic Subscription (BONUS: Allocators): rmw_implementation (`#219 <https://github.com/ros2/rmw_implementation/issues/219>`_)
