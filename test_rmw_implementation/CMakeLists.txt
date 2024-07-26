@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 
 project(test_rmw_implementation)
 
-# Default to C++17
+# Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -180,16 +179,6 @@ if(BUILD_TESTING)
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
     ament_target_dependencies(test_duration_infinite${target_suffix}
       osrf_testing_tools_cpp rcutils rmw rmw_implementation test_msgs
-    )
-
-    ament_add_gtest(test_event${target_suffix}
-    test/test_event.cpp
-    ENV ${rmw_implementation_env_var}
-    )
-    target_compile_definitions(test_event${target_suffix}
-      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
-    ament_target_dependencies(test_event${target_suffix}
-      osrf_testing_tools_cpp rmw rmw_implementation test_msgs
     )
   endmacro()
 

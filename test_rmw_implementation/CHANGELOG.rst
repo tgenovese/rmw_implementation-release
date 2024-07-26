@@ -2,31 +2,15 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.12.1 (2024-07-11)
--------------------
-* Add test creating two content filter topics with the same topic name … (`#235 <https://github.com/ros2/rmw_implementation/issues/235>`_)
-* Contributors: Alejandro Hernández Cordero, Mario Domínguez López, Tomoya Fujita
+2.8.4 (2024-07-26)
+------------------
+* Add test creating two content filter topics with the same topic name … (backport `#233 <https://github.com/ros2/rmw_implementation/issues/233>`_) (`#236 <https://github.com/ros2/rmw_implementation/issues/236>`_)
+* Contributors: mergify[bot]
 
-2.12.0 (2023-04-11)
--------------------
-* Add tests for rmw matched event (`#216 <https://github.com/ros2/rmw_implementation/issues/216>`_)
-* Contributors: Barry Xu
-
-2.11.0 (2023-02-13)
--------------------
-* Update rmw_implementation to C++17. (`#214 <https://github.com/ros2/rmw_implementation/issues/214>`_)
-* [rolling] Update maintainers - 2022-11-07 (`#212 <https://github.com/ros2/rmw_implementation/issues/212>`_)
-* Contributors: Audrow Nash, Chris Lalancette
-
-2.10.0 (2022-11-02)
--------------------
-* Add rmw_get_gid_for_client & tests (`#206 <https://github.com/ros2/rmw_implementation/issues/206>`_)
-* Contributors: Brian
-
-2.9.1 (2022-09-13)
+2.8.3 (2024-05-15)
 ------------------
 
-2.9.0 (2022-04-29)
+2.8.2 (2023-01-10)
 ------------------
 
 2.8.1 (2022-03-28)
