@@ -2,6 +2,21 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.4 (2025-03-11)
+------------------
+* Added rmw_event_type_is_supported (`#250 <https://github.com/ros2/rmw_implementation/issues/250>`_)
+  * Added rmw_event_check_compatible
+  * fix return typoe
+  * updated name and use in wait_set test
+  ---------
+* Update expectations of tests to remain compatible with non-DDS middlewares (`#248 <https://github.com/ros2/rmw_implementation/issues/248>`_)
+* use rmw_enclave_options_xxx APIs instead. (`#247 <https://github.com/ros2/rmw_implementation/issues/247>`_)
+* Fix up some overwritten errors. (`#246 <https://github.com/ros2/rmw_implementation/issues/246>`_)
+  That is, make sure to clear out errors where we should.
+  We also slightly rewrite some of the testing around
+  unsupported APIs, so that they make more sense.
+* Contributors: Alejandro Hernández Cordero, Chris Lalancette, Tomoya Fujita, yadunund
+
 3.0.3 (2024-11-20)
 ------------------
 
