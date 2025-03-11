@@ -34,10 +34,12 @@ class TestPublisher : public ::testing::Test
 protected:
   void SetUp() override
   {
+    rcutils_allocator_t allocator = rcutils_get_default_allocator();
     init_options = rmw_get_zero_initialized_init_options();
-    rmw_ret_t ret = rmw_init_options_init(&init_options, rcutils_get_default_allocator());
+    rmw_ret_t ret = rmw_init_options_init(&init_options, allocator);
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
-    init_options.enclave = rcutils_strdup("/", rcutils_get_default_allocator());
+    ret = rmw_enclave_options_copy("/", &allocator, &init_options.enclave);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     ASSERT_STREQ("/", init_options.enclave);
     context = rmw_get_zero_initialized_context();
     ret = rmw_init(&init_options, &context);
@@ -398,6 +400,14 @@ TEST_F(TestPublisherUse, count_mismatched_subscriptions) {
     rmw_create_subscription(node, ts, topic_name, &other_qos_profile, &options);
   ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
 
+  // For DDS-based middlewares, the QoS defined above might result in a mismatch while it might not
+  // for other middlewares. Hence, we rely on rmw_qos_profile_check_compatible to infer whether
+  // the publisher and subscription will match and accordingly evaluate match counts.
+  rmw_qos_compatibility_type_t compat;
+  rmw_ret_t rmw_ret =
+    rmw_qos_profile_check_compatible(qos_profile, other_qos_profile, &compat, nullptr, 0);
+  ASSERT_EQ(rmw_ret, RMW_RET_OK);
+
   // TODO(hidmic): revisit when https://github.com/ros2/rmw/issues/264 is resolved.
   SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
     ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
@@ -410,7 +420,11 @@ TEST_F(TestPublisherUse, count_mismatched_subscriptions) {
     ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
   });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  EXPECT_EQ(0u, subscription_count);
+  if (compat == RMW_QOS_COMPATIBILITY_OK) {
+    EXPECT_EQ(1u, subscription_count);
+  } else {
+    EXPECT_EQ(0u, subscription_count);
+  }
 
   ret = rmw_destroy_subscription(node, sub);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -537,11 +551,11 @@ protected:
       EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
       rmw_reset_error();
       EXPECT_EQ(nullptr, msg_pointer);
-      ret = rmw_return_loaned_message_from_publisher(pub, &msg_pointer);
+      ret = rmw_return_loaned_message_from_publisher(pub, msg_pointer);
       EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
       rmw_reset_error();
       EXPECT_EQ(nullptr, msg_pointer);
-      ret = rmw_publish_loaned_message(pub, &msg_pointer, null_allocation);
+      ret = rmw_publish_loaned_message(pub, msg_pointer, null_allocation);
       EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
       rmw_reset_error();
       EXPECT_EQ(nullptr, msg_pointer);
