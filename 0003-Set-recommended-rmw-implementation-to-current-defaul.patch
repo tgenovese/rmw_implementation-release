@@ -1,4 +1,4 @@
-From 2c0f3f4a3c552abe3e38e18ae9cb75be2a969608 Mon Sep 17 00:00:00 2001
+From 031ab0c2dc9a7c05579777263ac1c2805b3a263a Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Steven!=20Ragnar=C3=B6k?=
  <nuclearsandwich@users.noreply.github.com>
 Date: Wed, 2 Mar 2022 06:42:46 -0800
@@ -22,5 +22,5 @@ index 0646a32..ae85612 100644
  
  @[for p in Depends]Requires:       @p@\n@[end for]@
 -- 
-2.34.1
+2.43.0
 
