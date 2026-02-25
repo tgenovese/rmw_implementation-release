@@ -1,0 +1,25 @@
+From f7665850c305ff79a8d18f0806750f10abf7b9a5 Mon Sep 17 00:00:00 2001
+From: Thierry Genovese <tgenovese@users.noreply.github.com>
+Date: Wed, 25 Feb 2026 13:10:00 -0500
+Subject: [PATCH] Remove dependency on connextdds as it is not available on
+ bookworm
+
+---
+ package.xml | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/package.xml b/package.xml
+index 7b805e9..9536a58 100644
+--- a/package.xml
++++ b/package.xml
+@@ -25,7 +25,6 @@
+   Bloom does not support group_depend so entries below duplicate the group rmw_implementation_packages.
+   This ensures that binary packages have support for all of these rmw impl. enabled.
+   -->
+-  <build_depend>rmw_connextdds</build_depend>
+   <build_depend>rmw_cyclonedds_cpp</build_depend>
+   <build_depend>rmw_fastrtps_cpp</build_depend>
+   <build_depend>rmw_fastrtps_dynamic_cpp</build_depend>
+-- 
+2.43.0
+
