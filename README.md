@@ -1,3 +1,29 @@
+## rmw_implementation (jazzy) - 2.15.6-2
+
+The packages in the `rmw_implementation` repository were released into the `jazzy` distro by running `/usr/bin/bloom-release --rosdistro jazzy --override-release-repository-push-url git@github.com:tgenovese/rmw_implementation-release.git rmw_implementation` on `Wed, 25 Feb 2026 18:10:53 -0000`
+
+The `rmw_implementation` package was released.
+
+These packages were explicitly ignored:
+- `test_rmw_implementation`
+
+Version of package(s) in repository `rmw_implementation`:
+
+- upstream repository: https://github.com/ros2/rmw_implementation.git
+- release repository: https://github.com/tgenovese/rmw_implementation-release.git
+- rosdistro version: `2.15.6-1`
+- old version: `2.15.6-1`
+- new version: `2.15.6-2`
+
+Versions of tools used:
+
+- bloom version: `0.13.0`
+- catkin_pkg version: `1.1.0`
+- rosdep version: `0.26.0`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## rmw_implementation (kilted) - 3.0.6-1
 
 The packages in the `rmw_implementation` repository were released into the `kilted` distro by running `/usr/bin/bloom-release --rosdistro kilted --track kilted rmw_implementation` on `Tue, 23 Dec 2025 10:03:52 -0000`
